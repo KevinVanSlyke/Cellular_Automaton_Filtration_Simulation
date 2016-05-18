@@ -16,7 +16,7 @@ Dated Jan 2 2016 */
 //Default constructor
 dust_grain::dust_grain()
 {
-	mySize = 0;
+	mySize = -1;
 	myX = std::vector<int>(0);
 	myY = std::vector<int>(0);
 	stuck = false;
@@ -26,6 +26,13 @@ dust_grain::dust_grain()
 	hasMoved = false;
 	grainID = -1;
 	filter = false;
+	maxXLoc = -1;
+	maxYLoc = -1;
+	width = -1;
+	maxXStep = -1;
+	maxYStep = -1;
+	prevXVel = -1;
+	prevYVel = -1;
 }
 
 //Constructor with parameters
@@ -41,6 +48,13 @@ dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size)
 	hasMoved = false;
 	grainID = -1;
 	filter = false;
+	maxXLoc = -1;
+	maxYLoc = -1;
+	width = -1;
+	maxXStep = -1;
+	maxYStep = -1;
+	prevXVel = -1;
+	prevYVel = -1;
 }
 
 dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size, int id)
@@ -55,6 +69,13 @@ dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size, int id)
 	hasMoved = false;
 	grainID = id;
 	filter = false;
+	maxXLoc = -1;
+	maxYLoc = -1;
+	width = -1;
+	maxXStep = -1;
+	maxYStep = -1;
+	prevXVel = -1;
+	prevYVel = -1;
 	//Debug Line
 	//std::cout << "Grain ID " << grainID << " created." << std::endl;
 }
@@ -73,6 +94,13 @@ dust_grain::dust_grain(const dust_grain  & d)
 	hasMoved = d.hasMoved;
 	grainID = d.grainID;
 	filter = d.filter;
+	maxXLoc = d.maxXLoc;
+	maxYLoc = d.maxYLoc;
+	width = d.width;
+	maxXStep = d.maxXStep;
+	maxYStep = d.maxYStep;
+	prevXVel = d.prevXVel;
+	prevYVel = d.prevYVel;
 }
 
 //Desctructor.
@@ -97,6 +125,13 @@ dust_grain ::operator = (const dust_grain  & rhs)
 		hasMoved = rhs.hasMoved;
 		grainID = rhs.grainID;
 		filter = rhs.filter;
+		maxXLoc = rhs.maxXLoc;
+		maxYLoc = rhs.maxYLoc;
+		width = rhs.width;
+		maxXStep = rhs.maxXStep;
+		maxYStep = rhs.maxYStep;
+		prevXVel = rhs.prevXVel;
+		prevYVel = rhs.prevYVel;
 	}
 	return *this;
 }
@@ -132,12 +167,12 @@ bool dust_grain::spotTaken(int x, int y)
 }
 
 //Moves the location of a single dust particle.
-void dust_grain::moveStep(int x, int y, int maxX, int maxY)
+void dust_grain::moveStep(int x, int y)
 {
 	for (int c = 0; c < mySize; c++)
 	{
-		myX[c] = (myX[c] + x + maxX) % maxX;
-		myY[c] = (myY[c] + y + maxY) % maxY;
+		myX[c] = (myX[c] + x + maxXLoc) % maxXLoc;
+		myY[c] = (myY[c] + y + maxYLoc) % maxYLoc;
 	}
 }
 
@@ -203,23 +238,24 @@ void dust_grain::setMerge(bool merge)
 	pendingMerge = merge;
 }
 
-void dust_grain::setMaxXVel(int xvel)
+void dust_grain::setMaxXLoc(int xLen)
 {
-	maxXVel = xvel;
+	maxXLoc = xLen;
 }
 
-int dust_grain::getMaxXVel()
+void dust_grain::setMaxYLoc(int yLen)
 {
-	return maxXVel;
-}
-void dust_grain::setMaxYVel(int yvel)
-{
-	maxYVel = yvel;
+	maxYLoc = yLen;
 }
 
-int dust_grain::getMaxYVel()
+void dust_grain::setMaxXStep(int mXStep)
 {
-	return maxYVel;
+	maxXStep = mXStep;
+}
+
+void dust_grain::setMaxYStep(int mYStep)
+{
+	maxYStep = mYStep;
 }
 
 void dust_grain::setFilter(bool filt)
@@ -261,7 +297,37 @@ std::vector <int> dust_grain::getYent()
 	return myY;
 }
 
-int dust_grain::calculateWidth(int maxXLoc)
+int dust_grain::getPrevYVel()
+{
+	return prevYVel;
+}
+
+int dust_grain::getPrevXVel()
+{
+	return prevXVel;
+}
+
+int dust_grain::getMaxXStep()
+{
+	return maxXStep;
+}
+
+int dust_grain::getMaxYStep()
+{
+	return maxYStep;
+}
+
+void dust_grain::setPrevYVel(int yVel)
+{
+	prevYVel = yVel;
+}
+
+void dust_grain::setPrevXVel(int xVel)
+{
+	prevXVel = xVel;
+}
+
+int dust_grain::calculateWidth()
 {
 	int hX = 0;
 	int lX = maxXLoc * 2;
@@ -323,7 +389,7 @@ int dust_grain::calculateWidth(int maxXLoc)
 
 /*	//Splits a grain vertically or horizontally at a central cell, whichever is more even
 //Has some major issues which caused me to pursue a better method.
-std::vector < dust_grain > dust_grain::attemptBreakUp(int maxX, int maxY)
+std::vector < dust_grain > dust_grain::attemptBreakUp()
 {
 	std::vector < int > copyMyX = std::vector < int >(mySize);
 	std::vector < int > copyMyY = std::vector < int >(mySize);
@@ -337,8 +403,8 @@ std::vector < dust_grain > dust_grain::attemptBreakUp(int maxX, int maxY)
 	//Create a copy of continuous dust occupied cells to account for a grain being partially across a boundary
 	for (int i = 0; i < mySize; i++)
 	{
-		copyMyX.push_back(myX[i] + maxX);
-		copyMyY.push_back(myY[i] + maxY);
+		copyMyX.push_back(myX[i] + maxXLoc);
+		copyMyY.push_back(myY[i] + maxYLoc);
 	}
 	counter = 0;
 	while (counter < mySize)

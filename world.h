@@ -57,11 +57,15 @@ public:
 	int ** getWorldArray();
 	dust_list * myList; // from below 
 
+	void setProcOutputFolder(std::string dirName);
+
 private:
 	//random_gen * myGenerator; 
 	int myxSpeed, myySpeed;
 	int  myXMax, myYMax;                            //World Size 
 	int ** myWorld;
+
+	std::string procOutputFolder;
 };
 #define world_H 
 #endif 

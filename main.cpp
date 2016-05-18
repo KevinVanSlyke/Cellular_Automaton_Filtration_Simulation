@@ -32,6 +32,7 @@ Dated Jan 2 2016*/
 
 using namespace std;
 
+
 // *******
 // M A I N
 // *******
@@ -190,8 +191,6 @@ int main(int argc, char *argv[])
 
 	myWorld = new world(xMax, yMax, xSpeed, ySpeed);
 	/*Sets the simulation size in the dust_list object for use in dust_list routines*/
-	myWorld->myList->setMaxXLoc(xMax);
-	myWorld->myList->setMaxYLoc(yMax);
 	//TODO: Make arbitrary for any number of filter lines appended to end of parameter text file.
 	if (FilterGap == (-1) && Filter2Gap == (-1))
 	{
@@ -218,38 +217,40 @@ int main(int argc, char *argv[])
 	std::cout << "Total No. of Dust Grains =  " << myWorld->myList->getTotal() - filter << std::endl;
 	std::cout << "X Max = " << myWorld->getMaxXSize() << ". Y Max = " << myWorld->getMaxYSize() << ". " << std::endl;
 	//chdir("/gpfs/scratch/kgvansly/");
-	//chdir("/projects/academic/sen/kgvansly/Dust_Data");
-	chdir("/home/kevin/Documents/Dust_Data");
+	//chdir("/projects/academic/sen/kgvansly/Dust_Data/");
+	//chdir("/home/kevin/Dust_Data/");
 	std::ostringstream oFolder;
-	oFolder << filter << "fltrs" << FilterGap << "pr" << FilterWidth << "fbr" << FilterLength << "fl"<< totalGrains << "ptcls" << MinGrainSize << "-" << MaxGrainSize << "dstr" << xMax << "x" << yMax << "y" << xSpeed << "vx" << ySpeed << "vy" << MaxTime << "tm";
+	oFolder << "/home/kevin/Dust_Data/" << filter << "fltrs" << FilterGap << "pr" << FilterWidth << "fbr" << FilterLength << "fl"<< totalGrains << "ptcls" << MinGrainSize << "-" << MaxGrainSize << "dstr" << xMax << "x" << yMax << "y" << xSpeed << "vx" << ySpeed << "vy" << MaxTime << "tm";
 	std::string outputFolder = oFolder.str();
 
 	if(mkdir(outputFolder.c_str(), S_IRWXU) == -1)
 		std::cout << "Folder " << outputFolder << " already exists, entering..." << std::endl;
 	else
 		mkdir(outputFolder.c_str(), S_IRWXU);
-	chdir(outputFolder.c_str());
+	//chdir(outputFolder.c_str());
 
 	struct stat fileInfo;
-	if (stat("parameters.txt", &fileInfo) == 0)
+	std::string paramFile = outputFolder + "/parameters.txt";
+	if (stat(paramFile.c_str(), &fileInfo) == 0)
 	{
 		std::cout << "parameters.txt already exists, not writting" << std::endl;
 	}
 	else
 	{
-		FILE * parameterFile = fopen("parameters.txt", "a");
+		FILE * parameterFile = fopen(paramFile.c_str(), "a");
 		// OUTPUT: dust, size, y-position, y-step, x-localSp, y-localSp
 		fprintf(parameterFile, "%d %d \n%d %d \n%d \n%d %d \n%d \n%d %d %d \n%d %d %d \n%d %d %d", xMax, yMax, xSpeed, ySpeed, totalGrains, MinGrainSize, MaxGrainSize, MaxTime, sticking, splitting, merging, FilterWidth, FilterGap, FilterLength, Filter2Width, Filter2Gap, Filter2Length);
 		fclose(parameterFile);
 	}
 
 	std::ostringstream pFolder;
-	pFolder << "Trial" << trialID;
+	pFolder << outputFolder +  "/Trial" << trialID;
 	std::string processFolder = pFolder.str();
 	mkdir(processFolder.c_str(), S_IRWXU);
-	chdir(processFolder.c_str());
+	//chdir(processFolder.c_str());
+	myWorld->setProcOutputFolder(processFolder);
+	myWorld->myList->setProcOutputFolder(processFolder);
 	/* End of folder creation routine */
-
 	/* Statistics collection calls, might be better to move them to lower level objects. */
 	myWorld->myList->dust_dstr();
 	myWorld->myList->setFunctionality(enableSplitting, enableSticking, enableMerging);
@@ -269,8 +270,8 @@ int main(int argc, char *argv[])
 	diff(&before, &after, &time_diff);
 	time_s = time_diff.tv_sec + (double)(time_diff.tv_nsec)/1.0e9;
 	std::cout << "Total runtime is: " << time_s << " seconds." << std::endl;
-
-	ofstream timeOptimization("timeOptimization.txt", ios::app);
+	std::string timeOptFile = outputFolder + "/timeOptimization.txt";
+	ofstream timeOptimization(timeOptFile.c_str(), ios::app);
 	if (timeOptimization.is_open())
 	{
 		//writing: time of calculation, number of particles and length/width

@@ -30,6 +30,10 @@ world::world()
 			myWorld[c][d] = -1;
 	}
 	myList = new dust_list(myWorld);
+	myList->setMaxXLoc(myXMax);
+	myList->setMaxYLoc(myYMax);
+	myList->setMaxXVel(myxSpeed);
+	myList->setMaxYVel(myySpeed);
 }
 
 //Constructor with size and velocity inputs
@@ -49,6 +53,10 @@ world::world(int x, int y, int xSpeed, int ySpeed)
 			myWorld[c][d] = -1;
 	}
 	myList = new dust_list(myWorld);
+	myList->setMaxXLoc(myXMax);
+	myList->setMaxYLoc(myYMax);
+	myList->setMaxXVel(myxSpeed);
+	myList->setMaxYVel(myySpeed);
 }
 
 // Copy constructor 
@@ -206,7 +214,7 @@ void world::shakefilter(int filterGap, int filterWidth, int filterLength, float 
 void world::takeStep()
 {
 	//	std::cout<<"1"<<std::endl; 
-	myList->moveStep(myxSpeed, myySpeed, myWorld);
+	myList->moveStep(myWorld);
 
 }
 
@@ -222,17 +230,24 @@ void world::updateWorld()
 	}
 }
 
+void world::setProcOutputFolder(std::string dirName)
+{
+	procOutputFolder = dirName;
+}
+
 //The following function can be used to track dust movement via an output text file.  
 void world::writingDust()
 {
 	dust_grain temp;
 
+	std::string dustBeltFile = procOutputFolder + "/dustBeltX.txt";
 	FILE * pFileBelt;
 	// OUTPUT: number, size, y-position in a belt [240, 250]
-	pFileBelt = fopen("dustBeltX.txt", "a");
+	pFileBelt = fopen(dustBeltFile.c_str(), "a");
 
+	std::string beltCountFile = procOutputFolder + "/beltCountX.txt";
 	FILE * pBeltCount;
-	pBeltCount = fopen("beltCountX.txt", "a");
+	pBeltCount = fopen(beltCountFile.c_str(), "a");
 
 	std::vector<int> belt_dust;
 	
@@ -268,8 +283,9 @@ void world::overlapingDust()
 	dust_grain tempi;
 	dust_grain tempj;
 
+	std::string dustOverlapFile = procOutputFolder + "/dustfileOverlap.txt";
 	FILE * pFileOverlap;
-	pFileOverlap = fopen("dustfileOverlap.txt", "a"); // overlaping
+	pFileOverlap = fopen(dustOverlapFile.c_str(), "a"); // overlaping
 
 	for (int i = 0; i < myList->getTotal(); ++i)
 	{

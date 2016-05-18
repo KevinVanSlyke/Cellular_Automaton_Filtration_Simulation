@@ -27,67 +27,79 @@ class dust_grain
 {
 public:
 
-	// constructors/destructor 
+	// Constructors/Destructor 
 	dust_grain();                        // default constructor (size==500)
 	dust_grain(std::vector<int> x, std::vector<int> y, int size);
 	dust_grain(std::vector<int> x, std::vector<int> y, int size, int id);    // initial size of dust_grain 
 	dust_grain(const dust_grain & d);   // copy constructor 
 	~dust_grain();                       // destructor 
 
-  // assignment 
+  	// Assignment 
 	const dust_grain & operator = (const dust_grain & d);
 
-	// accessors 
-	int getSize();
-	void setSize();
+	// Accessors
+	bool checkMoved();
+	bool checkMerge();
+	bool getFilter();
+	bool getStuck();
 	bool spotTaken(int x, int y);
+	int getSize();
 	int getXatc(int c);
 	int getYatc(int c);
-	std::vector <int> getXent();
-	std::vector <int> getYent();
-	// modifiers
-
-	//TODO: Should make each grain initialize with the value of maxX/Y Loc or figure out how to have it access it's parent.
-	void moveStep(int x, int y, int maxX, int maxY);
-	void setStuck(bool stk);
-	bool getStuck();
+	int getPrevYVel();
+	int getPrevXVel();
+	int getID();
 	int getPrevPB();
 	int getCurPB();
+	int getMaxXStep();
+	int getMaxYStep();
+	std::vector <int> getXent();
+	std::vector <int> getYent();
+	
+	// Simple modifiers
+	void setSize();
+	void setPrevYVel(int yVel);
+	void setPrevXVel(int xVel);
+	void setID(int newID);
+	void setStuck(bool stk);
 	void setPrevPB(int num);
 	void setCurPB(int num);
 	void setFilter(bool filt);
-	bool getFilter();
-	
-	int getID();
-	void setID(int newID);
-	bool checkMoved();
-	bool checkMerge();
 	void setMoved(bool moved);
 	void setMerge(bool merge);
-	void setMaxXVel(int xvel);
-	int getMaxXVel();
-	void setMaxYVel(int yvel);
-	int getMaxYVel();
+	void setMaxXLoc(int xLen);
+	void setMaxYLoc(int yLen);
+	void setMaxXStep(int mXStep);
+	void setMaxYStep(int mYStep);
+	
+	// Complex Modifiers
+	void moveStep(int x, int y);
 	void growGrain(std::vector <int> x, std::vector <int> y);
+	int calculateWidth();
+	
+	// Clear data
 	void clearGrain();
-	int calculateWidth(int maxXLoc);
+	
 	//std::vector < dust_grain > attemptBreakUp(int maxX, int maxY)
 
 private:
-
-	int mySize;  //dust_grain Size 
-	std::vector<int> myX, myY;
 	bool stuck;
-	int prevPillbox;
-	int curPillbox;
-	
-	int grainID;
 	bool pendingMerge;
 	bool hasMoved;
-	int maxXVel;
-	int maxYVel;
 	bool filter;
+	
+	int mySize;  //dust_grain Size 
+	int prevPillbox;
+	int curPillbox;
+	int grainID;
+	int maxXLoc;
+	int maxYLoc;
 	int width;
+	int maxXStep;
+	int maxYStep;
+	int prevXVel;
+	int prevYVel;
+	std::vector<int> myX, myY;
 };
 #define DUST_GRAIN_H 
 #endif 

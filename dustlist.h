@@ -32,12 +32,12 @@ public:
 	dust_list(const dust_list & dl);   // copy constructor 
 	~dust_list();                       // destructor 
 
-// assignment 
+	// assignment 
 	const dust_list & operator = (const dust_list & dl);
 
 	// accessors 
 	int getTotal();
-	
+
 	double Abs(double Nbr);
 	int getTimeSteps();
 
@@ -49,7 +49,9 @@ public:
 
 	int getMaxXLoc();
 	int getMaxYLoc();
-
+	int getMaxXVel();
+	int getMaxYVel();
+	
 	void setPillBoxes(int loc, std::vector< int > pBoxes);
 	void setpBCounts(int loc, int pCounts);
 	void setPoreJamTimer(int loc, int jamTimer);
@@ -58,7 +60,8 @@ public:
 
 	void setMaxXLoc(int maxX);
 	void setMaxYLoc(int maxY);
-
+	void setMaxXVel(int xvel);
+	void setMaxYVel(int xvel);
 	void resetPBCounts();
 	void resetPotentialBlock();
 	void incrimentPBCounts(int loc);
@@ -66,7 +69,7 @@ public:
 	void incrimentTimeStep();
 	
 	// modifiers 
-	void moveStep(int Speedx, int Speedy, int ** &updateWorld);
+	void moveStep(int ** &updateWorld);
 
 	void addGrain(int low, int high);
 	void addGrain(int filterGap, int filterWidth, int filterLength);
@@ -84,6 +87,8 @@ public:
 	void setNewTotal();
 
 	void setFunctionality(bool splitting, bool sticking, bool merging);
+
+	void setProcOutputFolder(std::string dirName);
 
 private:
 	void removeMergedGrain();
@@ -126,6 +131,8 @@ private:
 	int numTimeSteps;
 	int maxXLoc;
 	int maxYLoc;
+	int maxXVel;
+	int maxYVel;
 	bool enableSticking;
 	bool enableMerging;
 	bool enableSplitting;
@@ -141,7 +148,8 @@ private:
 	std::vector < dust_grain > grainsToAdd;
 	int uniqueID;
 	int ptclsHandled;
-	
+
+	std::string procOutputFolder;
 
 	std::vector < std::vector < int > > dustDist;
 	std::vector < std::vector < int > > sizeDist;

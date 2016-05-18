@@ -376,9 +376,6 @@ int main(int argc, char *argv[])
 	initWorldImage();
 	
 	myWorld = new world(xMax, yMax, xSpeed, ySpeed);
-	/*Sets the simulation size in the dust_list object for use in dust_list routines*/
-	myWorld->myList->setMaxXLoc(xMax);
-	myWorld->myList->setMaxYLoc(yMax);
 	//TODO: Make arbitrary for any number of filter lines appended to end of parameter text file.
 	if (filterGap == (-1) && filter2Gap == (-1))
 	{
@@ -405,8 +402,8 @@ int main(int argc, char *argv[])
 	std::cout << "Total No. of Dust Grains =  " << myWorld->myList->getTotal() - filter << std::endl;
 	std::cout << "X Max = " << myWorld->getMaxXSize() << ". Y Max = " << myWorld->getMaxYSize() << ". " << std::endl;
 	//chdir("/gpfs/scratch/kgvansly/");
-	//chdir("/projects/academic/sen/kgvansly/Dust_Data");
-	chdir("/home/kevin/Dust_Data");
+	//chdir("/projects/academic/sen/kgvansly/Dust_Data/");
+	//chdir("/home/kevin/Dust_Data/");
 	std::ostringstream oFolder;
 	oFolder << filter << "fltrs" << filterGap << "pr" << filterWidth << "fbr" << FilterLength << "fl"<< totalGrains << "ptcls" << minGrainSize << "-" << maxGrainSize << "dstr" << xMax << "x" << yMax << "y" << xSpeed << "vx" << ySpeed << "vy" << maxTime << "tm";
 	std::string outputFolder = oFolder.str();
@@ -415,26 +412,29 @@ int main(int argc, char *argv[])
 		std::cout << "Folder " << outputFolder << " already exists, entering..." << std::endl;
 	else
 		mkdir(outputFolder.c_str(), S_IRWXU);
-	chdir(outputFolder.c_str());
+	//chdir(outputFolder.c_str());
 
 	struct stat fileInfo;
-	if (stat("parameters.txt", &fileInfo) == 0)
+	std::string paramFile = outputFolder + "/parameters.txt";
+	if (stat(paramFile.c_str(), &fileInfo) == 0)
 	{
 		std::cout << "parameters.txt already exists, not writting" << std::endl;
 	}
 	else
 	{
-		FILE * parameterFile = fopen("parameters.txt", "a");
+		FILE * parameterFile = fopen(paramFile.c_str(), "a");
 		// OUTPUT: dust, size, y-position, y-step, x-localSp, y-localSp
 		fprintf(parameterFile, "%d %d \n%d %d \n%d \n%d %d \n%d \n%d %d %d \n%d %d %d \n%d %d %d", xMax, yMax, xSpeed, ySpeed, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, FilterLength, filter2Width, filter2Gap, Filter2Length);
 		fclose(parameterFile);
 	}
 
 	std::ostringstream pFolder;
-	pFolder << "Trial" << trialID;
+	pFolder << outputFolder +  "/Trial" << trialID;
 	std::string processFolder = pFolder.str();
 	mkdir(processFolder.c_str(), S_IRWXU);
-	chdir(processFolder.c_str());
+	//chdir(processFolder.c_str());
+	myWorld->setProcOutputFolder(processFolder);
+	myWorld->myList->setProcOutputFolder(processFolder);
 	/* End of folder creation routine */
 
 	/* Statistics collection calls, might be better to move them to lower level objects. */
