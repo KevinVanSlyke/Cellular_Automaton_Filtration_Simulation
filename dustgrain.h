@@ -53,6 +53,8 @@ public:
 	int getCurPB();
 	int getMaxXStep();
 	int getMaxYStep();
+	int getColXVel();
+	int getColYVel();
 	std::vector <int> getXent();
 	std::vector <int> getYent();
 	
@@ -71,7 +73,8 @@ public:
 	void setMaxYLoc(int yLen);
 	void setMaxXStep(int mXStep);
 	void setMaxYStep(int mYStep);
-	
+	void setColXVel(int cXV);
+	void setColYVel(int cYV);
 	// Complex Modifiers
 	void moveStep(int x, int y);
 	void growGrain(std::vector <int> x, std::vector <int> y);
@@ -99,6 +102,8 @@ private:
 	int maxYStep;
 	int prevXVel;
 	int prevYVel;
+	int colXVel;
+	int colYVel;
 	std::vector<int> myX, myY;
 };
 #define DUST_GRAIN_H 

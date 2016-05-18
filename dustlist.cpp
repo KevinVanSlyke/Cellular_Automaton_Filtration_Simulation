@@ -259,12 +259,14 @@ void dust_list::moveStep(int ** &updateWorld)
 	{
 		if (!myDustList[i].getFilter())
 		{
-			myXStep = (int)(((maxXVel * myGenerator->Ran()) - (maxXVel / 2.0)) / (myDustList[i].getSize()));
-			myYStep = (int)((maxYVel * myGenerator->Ran()) / (myDustList[i].getSize()));
+			myXStep = (int)((((maxXVel + myDustList[i].getColXVel())* myGenerator->Ran()) - (maxXVel / 2.0)) / (myDustList[i].getSize()));
+			myYStep = (int)(((maxYVel + myDustList[i].getColYVel())* myGenerator->Ran()) / (myDustList[i].getSize()));
 			myDustList[i].setMaxXStep(myXStep);
 			myDustList[i].setMaxYStep(myYStep);
 			myDustList[i].setMoved(false);
 			myDustList[i].setPrevPB(myDustList[i].getCurPB());
+			myDustList[i].setColXVel(0);
+			myDustList[i].setColYVel(0);
 		}
 	}
 
@@ -690,6 +692,30 @@ void dust_list::moveStep(int ** &updateWorld)
 //	fclose(pFileStuck);
 
 	//////////////////////////////////////////////////////////
+}
+void dust_list::calculatePostCollisionVelocities(dust_grain movingPtcl, dust_grain staticPtcl, int movActXVel, int movActYVel)
+{
+//	int statXVelBefore = staticPtcl.getPrevXVel();
+//	int statYVelBefore = staticPtcl.getPrevYVel();
+//	int statXMomBefore = staticPtcl.getSize()*statXVelBefore;
+//	int statYMomBefore = staticPtcl.getSize()*statYVelBefore;
+	int movXVelBefore = movingPtcl.getMaxXStep();
+	int movYVelBefore = movingPtcl.getMaxYStep();
+//	int movXMomBefore = movingPtcl.getSize()*movXVelBefore;
+//	int movYMomBefore = movingPtcl.getSize()*movYVelBefore;
+//	int netXMom = movXMomBefore + statXMomBefore;
+//	int netYMom = movYMomBefore + statYMomBefore;
+//	int statXMomAfter, statYMomAfter, movXMomAfter, movYMomAfter, statXVelAfter, statYVelAfter, movXVelAfter, movYVelAfter;
+
+	int xImpulse = (movXVelBefore - movActXVel)*movingPtcl.getSize();
+	int yImpulse = (movYVelBefore - movActYVel)*movingPtcl.getSize();
+
+	staticPtcl.setColXVel(xImpulse/staticPtcl.getSize());
+	staticPtcl.setColYVel(yImpulse/staticPtcl.getSize());
+	
+	//Check if it hit statPtcl from behind or the side
+
+
 }
 
 void dust_list::setFunctionality(bool splitting, bool sticking, bool merging)

@@ -405,7 +405,7 @@ int main(int argc, char *argv[])
 	//chdir("/projects/academic/sen/kgvansly/Dust_Data/");
 	//chdir("/home/kevin/Dust_Data/");
 	std::ostringstream oFolder;
-	oFolder << filter << "fltrs" << filterGap << "pr" << filterWidth << "fbr" << FilterLength << "fl"<< totalGrains << "ptcls" << minGrainSize << "-" << maxGrainSize << "dstr" << xMax << "x" << yMax << "y" << xSpeed << "vx" << ySpeed << "vy" << maxTime << "tm";
+	oFolder << "/home/kevin/Dust_Data/" << filter << "fltrs" << filterGap << "pr" << filterWidth << "fbr" << FilterLength << "fl"<< totalGrains << "ptcls" << minGrainSize << "-" << maxGrainSize << "dstr" << xMax << "x" << yMax << "y" << xSpeed << "vx" << ySpeed << "vy" << maxTime << "tm";
 	std::string outputFolder = oFolder.str();
 
 	if(mkdir(outputFolder.c_str(), S_IRWXU) == -1)

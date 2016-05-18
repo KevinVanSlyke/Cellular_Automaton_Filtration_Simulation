@@ -166,6 +166,25 @@ bool dust_grain::spotTaken(int x, int y)
 	return false;
 }
 
+int dust_grain::getColXVel()
+{
+	return colXVel;
+}
+
+int dust_grain::getColYVel()
+{
+	return colYVel;
+}
+
+void dust_grain::setColXVel(int cXV)
+{
+	colXVel = cXV;
+}
+
+void dust_grain::setColYVel(int cYV)
+{
+	colYVel = cYV;
+}
 //Moves the location of a single dust particle.
 void dust_grain::moveStep(int x, int y)
 {

@@ -126,6 +126,7 @@ private:
 	//Function to calculate size/width statistics
 	std::vector <double> calc_stats(std::vector < std::vector < int > > distribution);
 
+	void calculatePostCollisionVelocities(dust_grain movingPtcl, dust_grain staticPtcl, int movXVelBefore, int movYVelBefore);
 	//Private variables
 	int myTotal;
 	int numTimeSteps;
