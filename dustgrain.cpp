@@ -33,6 +33,8 @@ dust_grain::dust_grain()
 	maxYStep = -1;
 	prevXVel = -1;
 	prevYVel = -1;
+	colXVel = 0;
+	colYVel = 0;
 }
 
 //Constructor with parameters
@@ -55,6 +57,8 @@ dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size)
 	maxYStep = -1;
 	prevXVel = -1;
 	prevYVel = -1;
+	colXVel = 0;
+	colYVel = 0;
 }
 
 dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size, int id)
@@ -76,6 +80,8 @@ dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size, int id)
 	maxYStep = -1;
 	prevXVel = -1;
 	prevYVel = -1;
+	colXVel = 0;
+	colYVel = 0;
 	//Debug Line
 	//std::cout << "Grain ID " << grainID << " created." << std::endl;
 }
@@ -101,9 +107,11 @@ dust_grain::dust_grain(const dust_grain  & d)
 	maxYStep = d.maxYStep;
 	prevXVel = d.prevXVel;
 	prevYVel = d.prevYVel;
+	colXVel = d.colXVel;
+	colYVel = d.colYVel;
 }
 
-//Desctructor.
+//Destructor.
 dust_grain ::~dust_grain()
 {
 	mySize = 0;
@@ -132,6 +140,8 @@ dust_grain ::operator = (const dust_grain  & rhs)
 		maxYStep = rhs.maxYStep;
 		prevXVel = rhs.prevXVel;
 		prevYVel = rhs.prevYVel;
+		colXVel = rhs.colXVel;
+		colYVel = rhs.colYVel;
 	}
 	return *this;
 }

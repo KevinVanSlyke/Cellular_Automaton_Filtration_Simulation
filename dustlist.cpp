@@ -27,7 +27,6 @@ dust_list::dust_list()
 {
 	maxXLoc = 500;
 	maxYLoc = 500;
-	ptclsHandled = 0;
 	enableSticking = true;
 	enableMerging = false;
 	enableSplitting = false;
@@ -42,7 +41,6 @@ dust_list::dust_list(int** world)
 {
 	maxXLoc = 500;
 	maxYLoc = 500;
-	ptclsHandled = 0;
 	enableSticking = true;
 	enableMerging = false;
 	enableSplitting = false;
@@ -59,7 +57,6 @@ dust_list::dust_list(int** world, int total, int low, int high)
 {
 	maxXLoc = 500;
 	maxYLoc = 500;
-	ptclsHandled = 0;
 	enableSticking = true;
 	enableMerging = false;
 	enableSplitting = false;
@@ -93,7 +90,6 @@ dust_list::dust_list(const dust_list  & dl)
 	poreJamTimer = dl.poreJamTimer;
 	poreBlocked = dl.poreBlocked;
 	potentialBlock = dl.potentialBlock;
-	ptclsHandled = dl.ptclsHandled;
 }
 
 //Destructor
@@ -125,15 +121,12 @@ dust_list ::operator = (const dust_list  & rhs)
 		poreJamTimer = rhs.poreJamTimer;
 		poreBlocked = rhs.poreBlocked;
 		potentialBlock = rhs.potentialBlock;
-		ptclsHandled = rhs.ptclsHandled;
-
 	}
 	return *this;
 }
 
 int dust_list::getTotal()
 {
-
 	return myTotal;
 
 }
@@ -209,40 +202,14 @@ void dust_list::moveStep(int ** &updateWorld)
 
 	int myXStep, myYStep, curx, cury, stickx, sticky;
 	int ptclIndx, id;
-	bool xneg, check, stuck, pendingMerge, hasMoved, filter;
-	int stuckCount, ptclsHandled, toRemove, hugeCount;
+	bool xneg, check, stuck, pendingMerge, filter;
+	int stuckCount, ptclsHandled, toRemove, hugeCount, beltCount, numStationary, numSplit;
 	int ptclSize, collGrainID;
-	int numSplit;
-
-	//Debug lines
-/*	//std::cout << "Particles moving in order: " << std::endl;
-	//for(unsigned int i = 0; i < order.size(); i++)
-	//	std::cout << order[i] << " " << myDustList[order[i]].getID() << std::endl;
-//	FILE * pFile = 0;
-//	if (pFile == 0)
-//		pFile = fopen("dustfile.txt", "a");   // OUTPUT: dust, size, y-position, y-step, x-localSp, y-localSp
-
-
-//	FILE * pFileMoving = 0;
-//	if (pFileMoving == 0)
-//		pFileMoving = fopen("dustfileMoving.txt", "a");  // OUTPUT: "still moving" ptles
-
-//	FILE * pFileStuck = 0;
-//	if (pFileStuck == 0)
-//		pFileStuck = fopen("dustfileStuck.txt", "a");  // OUTPUT: "still moving" ptles
-
-//	FILE * pFilePill = 0;
-//	if (pFilePill == 0)
-//		pFilePill = fopen("dustfilePillCount.txt", "a");  // OUTPUT: # ptles in each  pillbox
-
-//	FILE * pFileMerge = 0;
-//	if (pFileMerge == 0)
-//		pFileMerge = fopen("dustMergers.txt", "a");  // OUTPUT: # ptles in each  pillbox */
 
 	std::vector<int> rem_dust(0);  // define a vector "remnant moving dust" in the chamber
 	resetPBCounts();
 	resetPotentialBlock();
-	resetHandled();
+	
 	clear_width_dstr();
 	clear_size_dstr();
 	stuckCount = 0;
@@ -250,6 +217,8 @@ void dust_list::moveStep(int ** &updateWorld)
 	toRemove = 0;
 	hugeCount = 0;
 	numSplit = 0;
+	beltCount = 0;
+	numStationary = 0;
 
 	std::vector<int> order = createRandomOrder();
 	std::vector<int>::iterator iter;
@@ -277,7 +246,6 @@ void dust_list::moveStep(int ** &updateWorld)
 		if(ptclIndx == -1)
 			std::cout << "Error: 1, starting" << std::endl;
 		stuck = myDustList[ptclIndx].getStuck();
-		hasMoved = myDustList[ptclIndx].checkMoved();
 		pendingMerge = myDustList[ptclIndx].checkMerge();
 		ptclSize = myDustList[ptclIndx].getSize();
 		filter = myDustList[ptclIndx].getFilter();
@@ -291,65 +259,32 @@ void dust_list::moveStep(int ** &updateWorld)
 			continue;
 			//std::cout << "Particle " << id << " is too large." << std::endl;
 		}
-
-		//Debug lines
-/*		std::cout << "Particle " << id << " is move number " << ptclsHandled+1 << " at element " << ptclIndx << " of " << myTotal << "." << std::endl;
-		std::cout << "Particle " << id << " has size " << ptclSize << "." << std::endl;
-		std::cout << "Particle " << id << " has initial core location " << myDustList[ptclIndx].getXatc(0) << "," << myDustList[ptclIndx].getYatc(0) << "." << std::endl;
-		std::cout << "Particle " << id << " has max X vel " << maxXVel/2 << " and max Y vel " << maxYVel << "." << std::endl;
-
-		if(hasMoved)
-			std::cout << "Has already moved." << std::endl;
-		else
-			std::cout << "Has not yet moved." << std::endl;
-
-		if(pendingMerge)
-			std::cout << "Is pending a merge with another particle." << std::endl;
-		else
-			std::cout << "Is not pending a merge with another particle." << std::endl;
-		if(stuck)
-			std::cout << "Is stuck to the filter" << std::endl;
-		else
-			std::cout << "Is not stuck to the filter." << std::endl;
-*/
-
 		//If the current particle was already flagged as stuck it will stay stuck, don't bother checking it's movement. Eventually add release probability
 		else if (filter)
 		{
-			ptclsHandled++;
 			curx = 0;
 			cury = 0;
-//			std::cout << id << " is a filter, and has been handled." << std::endl;
 			continue;
 		}
 		else if (stuck)
 		{
 			stuckCount++;
-			ptclsHandled++;
 			curx = 0;
 			cury = 0;
-//			std::cout << "Stuck ptcl has been handled." << std::endl;
 		}
-		else if (pendingMerge)
+		else if (pendingMerge) //Need to add momentum conservation since one particle doesnt move on collision, it should carry through to next timestep
 		{
-			ptclsHandled++;
 			curx = 0;
 			cury = 0;
-//			std::cout << "Particle pending merge has been handled." << std::endl;
 		}
-		else if (!stuck && !hasMoved && !pendingMerge && !filter)
+		else if (!stuck && !pendingMerge && !filter)
 		{
 			//Randomly generates the 'max' movement range for the given particle in the current time step for both x and y coordinates.
 			//X being horizontal currently allows for dust to drift left or right, so the maximum horizontal movement is really half of the input 'xSpeed'
 			//Effective max movement is weighted by the size of the particle, larger particles move slower.
 			myXStep = myDustList[ptclIndx].getMaxXStep();
 			myYStep = myDustList[ptclIndx].getMaxYStep();
-
-			update_width_dstr(myDustList[ptclIndx].calculateWidth());
-			update_size_dstr(myDustList[ptclIndx].getSize());
-			//Debug line
-//			std::cout << "Particle " << id << " has ran X vel " << myXStep << " and ran Y vel " << myYStep << "." << std::endl;
-
+		
 			//Set a boolean flag for if the x movement is left (-) or right (+)
 			xneg = (myXStep < 0) ? true : false;
 			curx = 0;
@@ -397,28 +332,26 @@ void dust_list::moveStep(int ** &updateWorld)
 			//This might always just be -1 to each, will need to debug.
 			if (!check)
 			{
-//				std::cout << "Particle " << id << " has come across a barrier durings it's random move vector." << std::endl;
-
 				//If it's stopped by something in the y direction.
 				if (sticky != 0)
 					--cury;
 				//If it's stopped by something in the x direction.
 				if (stickx != 0)
 					xneg ? curx++ : curx--;
-//				std::cout << "Particle " << id << " has final X vel " << curx << " and final Y vel " << cury << "." << std::endl;
 			}
+			if(curx != 0 || cury != 0)
+			{
 				//After the final destination is chosen we go through all of the particles originally occupied pixels (since it's 2D) and remove them
-			for (int i = 0; i < ptclSize; ++i)
-				refWorld[myDustList[ptclIndx].getYatc(i)][myDustList[ptclIndx].getXatc(i)] = -1;
+				for (int i = 0; i < ptclSize; ++i)
+					refWorld[myDustList[ptclIndx].getYatc(i)][myDustList[ptclIndx].getXatc(i)] = -1;
 
 				//Move the core of the particle in question
-			myDustList[ptclIndx].moveStep(curx, cury); // moveStep(int x, int y) is defined at dustgrain.cpp
+				myDustList[ptclIndx].moveStep(curx, cury); // moveStep(int x, int y) is defined at dustgrain.cpp
 
 				//Re-extend that particle in space
-			for (int j = 0; j < ptclSize; ++j)
-				refWorld[myDustList[ptclIndx].getYatc(j)][myDustList[ptclIndx].getXatc(j)] = id;
-//				std::cout << "Particle " << id << " moved successfully to a new core location " << myDustList[ptclIndx].getXatc(0) << "," << myDustList[ptclIndx].getYatc(0) << "." << std::endl;
-
+				for (int j = 0; j < ptclSize; ++j)
+					refWorld[myDustList[ptclIndx].getYatc(j)][myDustList[ptclIndx].getXatc(j)] = id;
+			}
 			if (stickx != 0 || sticky != 0)
 			{
 				collGrainID = getCollidingGrain(stickx, sticky, ptclIndx);
@@ -435,34 +368,20 @@ void dust_list::moveStep(int ** &updateWorld)
 					int collGrainIndx = getVecLocByID(collGrainID);
 					if (ptclIndx == -1)
 						std::cout << "Error: 2, merging" << std::endl;
-//					std::cout << "Particle id " << id << " and " << collGrainID << " have collided at..." << std::endl;
-					if (myDustList[collGrainIndx].getFilter() && enableSticking)
+					//std::cout << "Particle id " << id << " and " << collGrainID << " have collided at..." << std::endl;
+					if (myDustList[collGrainIndx].getFilter() && enableSticking) //If colliding with filter and sticking is on, stick to it
 					{
 						myDustList[ptclIndx].setStuck(true);
 						stuckCount++;
 						myDustList[ptclIndx].setMoved(true);
 					}
 					//Comment out the else statement below in order to turn off dust-to-dust merging
-					else if (enableMerging)
+					else if (enableMerging) //If merging is on combine the particles
 					{
 						//We need to properly account for a particle thats too large to move merging.
-
 						int old_size1, old_size2, new_size; // replaceX, replaceY;
 						old_size1 = myDustList[ptclIndx].getSize();
 						old_size2 = myDustList[collGrainIndx].getSize();
-					/*	if (old_size1 > old_size2)
-						{
-							mergedID = id;
-							myDustList[ptclIndx].setMoved(true);
-							myDustList[collGrainIndx].setMerge(true);
-						}
-						else
-						{
-							mergedID = collGrainID;
-							myDustList[collGrainIndx].setMoved(true);
-							myDustList[ptclIndx].setMerge(true);
-						}					*/
-
 						mergeGrain_g2_to_g1(ptclIndx, collGrainIndx);
 						new_size = myDustList[ptclIndx].getSize();
 						update_dstr_merge(old_size1, old_size2, new_size);
@@ -475,9 +394,13 @@ void dust_list::moveStep(int ** &updateWorld)
 						}
 						toRemove++;
 					}
-
+					else //If merging is off then we impart momentum upon collision
+					{
+ 						calculatePostCollisionVelocities(myDustList[ptclIndx], myDustList[collGrainIndx], curx, cury);		
+					}
 				}
 			}
+
 			//Sets 'previous' pillbox the particle was in equal to the current pillbox it's in, as the current value has not yet been updated in this iteration.
 			//TODO: Check if I can clean this all up to make it just one call for each non-stuck dust particle, something like checkContainer(xloc, yloc) where this function will save previous value, update to new value and call setPotentialBlock() as needed.
 			for (unsigned int i = 0; i < pBoxes.size(); i++)
@@ -504,12 +427,24 @@ void dust_list::moveStep(int ** &updateWorld)
 			// TRACKING ONLY MOVING PTLES: => (timeCount, # of moving particles)
 			// Is going to be writen in dustfileMoving.txt
 			if (curx != 0 || cury != 0)
+			{
 				rem_dust.push_back(id);           // Add item at end of "I am still moving" vector
+
+				if(myDustList[ptclIndx].getYatc(0) < maxYLoc/2 - 5 || myDustList[ptclIndx].getYatc(0) > maxYLoc/2 + 5)
+				{
+					update_width_dstr(myDustList[ptclIndx].calculateWidth());
+					update_size_dstr(myDustList[ptclIndx].getSize());
+				}
+				else
+					beltCount++;
+			}
+			else
+				numStationary++;
 			//Close parens for the stuck if statement, comment it out in the line below to stop sticking
 		}//End of if(!stuck)
 
 	//pFile=dustfile.txt
-		//Commented out for optimization
+	/*Commented out for optimization*/
 	//Outputs the particles ID, size, x and y location of its core, x and y displacement during this timestep
 	//fprintf(pFile, "%d %d %d %d %d %d \n",
 	//id, myDustList[ptclIndx].getSize(), myDustList[ptclIndx].getXatc(0), myDustList[ptclIndx].getYatc(0), curx, cury);
@@ -520,21 +455,14 @@ void dust_list::moveStep(int ** &updateWorld)
 	//Counts number of ptcls to remove
 	//std::cout << toRemove << " ptcles are to be removed." << std::endl;
 	//Removes merged ptcls from dustList
-	int oldTotal, removed;
 	if (enableMerging)
 	{
-		oldTotal = myTotal;
 		for (int r = 0; r < toRemove; r++)
 		{
 			removeMergedGrain();
 		}
-		removed = oldTotal - myTotal;
 	}
-	else
-	{
-		oldTotal = 0;
-		removed = 0;
-	}
+
 
 	//Comment out the nest two for statements below to turn off large dust grain splitting
 	if (enableSplitting)
@@ -549,7 +477,7 @@ void dust_list::moveStep(int ** &updateWorld)
 			ptclSize = myDustList[i].getSize();
 			if (ptclSize > maxXVel / 2 && ptclSize > maxYVel && !filter)
 			{
-//				std::cout << "Attempting to split up particle " << id << "." << std::endl;
+				//std::cout << "Attempting to split up particle " << id << "." << std::endl;
 				//Tell the world that the space occupied by the grain to be split is empty
 				for (int c = 0; c < ptclSize; c++)
 				{
@@ -587,7 +515,6 @@ void dust_list::moveStep(int ** &updateWorld)
 		}
 		grainsToAdd.clear();
 	}
-	//	std::cout << removed << " ptcles have been removed." << std::endl;
 
 	//Sets 'previous' pillbox the particle was in equal to the current pillbox it's in, as the current value has not yet been updated in this iteration.
 	//	scanPBoxes();
@@ -646,8 +573,8 @@ void dust_list::moveStep(int ** &updateWorld)
 		fprintf(pFileW, "%i", curTime);
 		for(unsigned int i = 0; i < dustWidth.size(); i++)
 		{
-																								int width = dustWidth[i][0];
-																								int wCount = dustWidth[i][1];
+			int width = dustWidth[i][0];
+			int wCount = dustWidth[i][1];
 			fprintf(pFileW, " %i %i", width, wCount);
 
 		}
@@ -661,8 +588,8 @@ void dust_list::moveStep(int ** &updateWorld)
 		fprintf(pFileS, "%i", curTime);
 		for(unsigned int i = 0; i < sizeDist.size(); i++)
 		{
-																								int size = sizeDist[i][0];
-																								int sCount = sizeDist[i][1];
+			int size = sizeDist[i][0];
+			int sCount = sizeDist[i][1];
 			fprintf(pFileS, " %i %i ", size, sCount);
 		}
 		fprintf(pFileS, "\n");
@@ -672,7 +599,7 @@ void dust_list::moveStep(int ** &updateWorld)
 		std::string dustCountFile = procOutputFolder + "/dustCount.txt";
 		if (cFile == 0)
 			cFile = fopen(dustCountFile.c_str(), "a");   // OUTPUT: dust, size, y-position, y-step, x-localSp, y-localSp
-		fprintf(cFile, "%i %i %i %i %i %i \n",(int) rem_dustS, stuckCount, hugeCount, numSplit, removed, myTotal);
+		fprintf(cFile, "%i %i %i %i %i %i %i %i\n",(int) rem_dustS, numStationary, stuckCount, toRemove, numSplit, myTotal, ptclsHandled, hugeCount);
 		fclose(cFile);
 	}
 	//fprintf(cFile, "%d \n", myTotal); //Totalgrains remaining removed for optimizing
@@ -714,8 +641,6 @@ void dust_list::calculatePostCollisionVelocities(dust_grain movingPtcl, dust_gra
 	staticPtcl.setColYVel(yImpulse/staticPtcl.getSize());
 	
 	//Check if it hit statPtcl from behind or the side
-
-
 }
 
 void dust_list::setFunctionality(bool splitting, bool sticking, bool merging)
@@ -1118,7 +1043,7 @@ void dust_list::mergeGrain_g2_to_g1(int g1Indx, int g2Indx) //KM
 	g2grain = myDustList[g2Indx];
 	g1sze = g1grain.getSize();
 	g2sze = g2grain.getSize();
-//	std::cout << "Sizes of particles to merge are " << g1sze << " and " << g2sze << "." << std::endl;
+	//std::cout << "Sizes of particles to merge are " << g1sze << " and " << g2sze << "." << std::endl;
 	totsze = g1sze + g2sze;
 	std::vector<int> x(totsze);
 	std::vector<int> y(totsze);
@@ -1126,14 +1051,14 @@ void dust_list::mergeGrain_g2_to_g1(int g1Indx, int g2Indx) //KM
 	{
 		x[c] = g1grain.getXatc(c);
 		y[c] = g1grain.getYatc(c);
-//		std::cout << x[c] << "\t" << y[c] << std::endl;
+		//std::cout << x[c] << "\t" << y[c] << std::endl;
 	}
-//	std::cout << std::endl;
+	//std::cout << std::endl;
 	for (c = 0; c < g2sze; c++)
 	{
 		x[c + g1sze] = g2grain.getXatc(c);
 		y[c + g1sze] = g2grain.getYatc(c);
-//		std::cout << x[c + g1sze] << "\t" << y[c + g1sze] << std::endl;
+		//std::cout << x[c + g1sze] << "\t" << y[c + g1sze] << std::endl;
 	}
 	myDustList[g1Indx].growGrain(x, y);
 	myDustList[g1Indx].setSize();
@@ -1811,16 +1736,6 @@ dust_grain dust_list::getGrainByID(int id)   // gets element "id" from vector "m
 	}
 	std::cout << "Error copying dust grain, id " << id << ". Returning empty dust grain." << std::endl;
 	return dust_grain();
-}
-
-void dust_list::incrementHandled()
-{
-	ptclsHandled++;
-}
-
-void dust_list::resetHandled()
-{
-	ptclsHandled = 0;
 }
 
 int dust_list::getIDByVecLoc(int n)

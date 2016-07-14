@@ -12,5 +12,5 @@ dust_simulation : main.cpp world.cpp dustlist.cpp dustgrain.cpp randomgen.cpp pa
 	$(CC) $(CFLAGS) -o dust_simulation main.cpp world.cpp dustlist.cpp dustgrain.cpp randomgen.cpp parameterReader.cpp timer.cpp
 	
 clean:
-	-rm dust_simulation visual_dust_simulation
+	-rm -f ./dust_simulation ./visual_dust_simulation
 

@@ -1,0 +1,394 @@
+int running = 0;
+bool zoom, offvisual = false;
+void myIdle();
+void takestep();
+void(*Functor)() = myIdle;
+void init();
+void display();
+void reshape(int w, int h);
+void mouse(int button, int state, int x, int y);
+int selectX1, selectY1, selectX2, selectY2;
+struct Box {    /* pixel coordinates for mouse events */
+	int left;
+	int right;
+	int top;
+	int bottom;
+} T_box, spin_box, algorithm_box[3], info_box;
+
+int isInside(struct Box *box, int x, int y) {
+	return box->left < x && box->right > x
+		&& box->top < y && box->bottom > y;
+}
+
+void myIdle()
+{
+	glutPostRedisplay();
+	myWorld->updateWorld();
+}
+
+void takestep()
+{
+
+	++timeCount;
+	myWorld->takeStep();
+	//std::cout<<"2"<<std::endl; 
+	myWorld->updateWorld();
+	//if(timeCount==60) // choose a time to register, if you whish... 
+	//{ }
+	myWorld->writingDust(); //tracking dust particles
+
+	if (!offvisual)
+		glutPostRedisplay();
+}
+
+void init()
+{
+	glClearColor(1.0, 195 / 255.0, 0.0, 0.0);
+	glShadeModel(GL_FLAT);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+}
+
+void drawText(const string& str, int x, int y)
+{
+	glRasterPos2i(x, y);
+	int len = str.find('\0');
+	for (int i = 0; i < len; i++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+}
+
+void display(void)
+{
+	int i;
+	double w, h, dxy;
+	std::string name[3] = { "Stop/Start", "Zoom In", "Turn Off Visual" };
+
+	dxy = T_box.bottom - T_box.top;
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3ub(192, 192, 192);
+	//h = dxy * (myWorld->getCurDust() ) / (1000); 
+	h = dxy *0.5;
+	glRectf(-30.0, 0.0, -6.0, h);
+
+	glColor3ub(0, 0, 0);
+	std::ostringstream os;
+
+	os.precision(3);
+	os << myWorld->getCurDust() - filter << std::ends;
+	drawText(os.str(), -33, int(h) - 12);
+	os.seekp(0);
+	glColor3f(0.0, 0.0, 1.0);  /* blue */
+
+	std::ostringstream os1;
+
+	os1 << "Time = " << timeCount << std::ends;
+	drawText(os1.str(), -33, dxy*0.5 + 250);
+	os1.seekp(0);
+	glColor3f(0.0, 0.0, 1.0);
+	//h = dxy * (initialnumberofdust) / (2*initialnumberofdust); 
+	h = dxy*0.5;
+	glRectf(-33.0, h - 2, -3.0, h + 2);
+	w = dxy / 3;
+	for (i = 0; i < 3; i++)
+	{
+		if (i == 0 && !running)
+		{
+			glColor3ub(230, 0, 0);
+
+			name[i] = "Paused";
+		}
+		else if (i == 0 && running)
+		{
+			glColor3ub(0, 230, 0);
+			name[i] = "Running";
+		}
+		else if (i == 1 && zoom)
+		{
+			glColor3ub(230, 0, 0);
+			name[i] = "Reset View";
+		}
+		else if (i == 1 && !zoom)
+		{
+			glColor3ub(0, 230, 0);
+			name[i] = "Zoom In";
+		}
+		else if (i == 2)
+		{
+
+			if (offvisual)
+			{
+				glColor3ub(230, 0, 0);
+				name[i] = "Turn On Visual";
+			}
+			else
+			{
+				glColor3ub(0, 230, 0);
+				name[i] = "Turn Off Visual";
+			}
+		}
+		else glColor3ub(0, 230, 0);
+
+
+		glRectf(i * w + 3, -30.0, (i + 1) * w - 3, -6.0);
+		glColor3ub(0, 0, 0);
+		os << name[i] << std::ends;
+		drawText(os.str(), i * int(w) + 10, -20);
+		os.seekp(0);
+	}
+
+	glColor3ub(0, 0, 230);
+	glRectf(500, -30.0, 1500, -6.0);
+
+
+	glRasterPos2i(0, 0);  //Specifies the raster position for pixel operations. 
+
+
+	glDrawPixels(myWorld->getMaxXSize(), myWorld->getMaxYSize(), GL_RGB, GL_UNSIGNED_BYTE, myWorld->getWorld());
+
+	/*  glDrawPixels: Writes a block of pixels to the frame buffer.
+	myWorld->getWorld() =(*MyWorld).(getWorld)
+	Means: member "getWorld()" of object pointed by myWorld */
+
+	glPixelZoom(1.0, 1.0); //zooming display region, original factor=1,1 
+
+
+
+/*
+	// sets a searching area
+	glColor3f(0,0,0);                     // black color
+	glRectf(-1.0, 240.0, 0.0, 249.0);     // searching area (left)
+	glRectf(500.0, 240.0, 501.0, 249.0);  // searching area (right)
+	glRectf(-1.0, 239.0, 501.0, 240.0);   // searching area (botom)
+	glRectf(-1.0, 249.0, 501.0, 250.0);   // searching area (top)
+	// end searching area
+*/
+
+// a ruler 
+	glColor3f(0.0, 0.0, 1.0);  /* blue */
+	std::ostringstream os0;
+	os0.precision(3);
+	os0 << "   0" << std::ends;
+	drawText(os0.str(), 500, 0);
+	os0.seekp(0);
+
+
+	std::ostringstream os125;
+	os125.precision(3);
+	os125 << " 125" << std::ends;
+	drawText(os125.str(), 500, 125);
+	os125.seekp(0);
+
+
+	std::ostringstream os250;
+	os250.precision(3);
+	os250 << " 250" << std::ends;
+	drawText(os250.str(), 500, 250);
+	os250.seekp(0);
+
+
+	std::ostringstream os375;
+	os375.precision(3);
+	os375 << " 375" << std::ends;
+	drawText(os375.str(), 500, 375);
+	os375.seekp(0);
+
+
+	std::ostringstream os500;
+	os500.precision(3);
+	os500 << " 500" << std::ends;
+	drawText(os500.str(), 500, 500);
+	os500.seekp(0);
+
+	// end ruler 
+
+
+	glutSwapBuffers();         // swaps the buffers of the current window 
+	glFlush();
+}
+
+void reshape(int w, int h)
+{
+	int min_size = 339, widget_size = 30, pad = 3;
+	int i, x, y, dx, dy, dxy, widget_area_size;
+	//Use to be just getMaxSize, where x and y max dimensions are equal
+	int L = myWorld->getMaxXSize();
+	widget_area_size = L > 300 ? L : 300;
+	dx = dy = pad + widget_size + pad + L + pad;
+	if (dx < min_size)
+		dx = min_size;
+	if (dy < min_size)
+		dy = min_size;
+
+	/*
+	If you wanted to center the dust image... but we dont.
+		 x = w > dx ? (w - dx) / 2 : 0;
+		 y = h > dy ? (h - dy) / 2 : 0;
+	*/
+
+	x = 15;
+	y = 35;
+
+	glViewport((GLint)x, (GLint)y, (GLsizei)dx, (GLsizei)dy);
+
+	T_box.left = x + pad;
+	T_box.right = T_box.left + widget_size;
+	T_box.bottom = h - y - pad - widget_size - pad;
+	T_box.top = T_box.bottom - widget_area_size;
+
+	spin_box.left = x + pad + widget_size + pad;
+	spin_box.right = spin_box.left + L;
+	spin_box.bottom = T_box.bottom;
+	spin_box.top = spin_box.bottom - L;
+
+	info_box.left = spin_box.right + pad + widget_size;
+	info_box.right = info_box.left + 200;
+	info_box.top = spin_box.bottom - L;
+	info_box.bottom = T_box.bottom;
+
+	dxy = widget_area_size / 3;
+
+	for (i = 0; i < 3; i++)
+	{
+		algorithm_box[i].left = spin_box.left + i * dxy + pad;
+		algorithm_box[i].right = spin_box.left + (i + 1) * dxy - pad;
+		algorithm_box[i].top = spin_box.bottom + pad;
+		algorithm_box[i].bottom = algorithm_box[i].top + widget_size;
+	}
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	x = y = -pad - widget_size - pad;
+	glOrtho(x, x + dx, y, y + dy, -1.0, 1.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	switch (button) {
+	case GLUT_LEFT_BUTTON:
+		if (state == GLUT_DOWN) {
+			if (isInside(&T_box, x, y))
+			{
+
+				//				   outfilebit(); 
+
+			}
+			else if (isInside(&algorithm_box[0], x, y))
+			{
+				if (running) {
+					running = 0;
+					glutIdleFunc(myIdle);
+				}
+				else {
+					running = 1;
+					glutIdleFunc(takestep);
+				}
+			}
+			else if (isInside(&algorithm_box[1], x, y))
+			{
+				if (zoom)
+				{
+					zoom = false;
+					myWorld->resetView();
+				}
+				else
+					zoom = true;
+
+
+			}
+
+			else if (isInside(&spin_box, x, y))
+			{
+				selectX1 = x - spin_box.left;
+				selectY1 = spin_box.top - y;
+			}
+			else if (isInside(&algorithm_box[2], x, y))
+			{
+				offvisual ? offvisual = false : offvisual = true;
+
+			}
+		}
+		if (state == GLUT_UP && isInside(&spin_box, x, y) && zoom)
+		{
+			selectX2 = x - spin_box.left;
+			selectY2 = spin_box.top - y;
+			if (selectX1 != selectX2&&selectY1 != selectY2)
+			{
+
+				myWorld->setView(selectX1, selectY2, selectX2, selectY1);
+				myWorld->setMagnification(max(min(500 / ((selectX2 - selectX1)), 500 / ((selectY1 - selectY2))), 1));
+			}
+
+		}
+		glutPostRedisplay();
+		break;
+	default:
+		break;
+	}
+}
+
+GLubyte * world::getWorld()   // GLubyte * <declare "getWorld()" member> 
+{
+	if (viewStartX < viewEndX && viewStartY < viewEndY)
+	{
+
+		for (int c = 0; c < myXMax; c++)
+			for (int d = 0; d < myYMax; d++)
+			{
+				dustImage[3 * (MAX_SIZE * (c)+d) + 0] = (GLubyte)0;
+				dustImage[3 * (MAX_SIZE * (c)+d) + 1] = (GLubyte)0;
+				dustImage[3 * (MAX_SIZE * (c)+d) + 2] = (GLubyte)0;
+			}
+
+		for (int c = viewStartX; c < viewEndX; c++) {
+			for (int d = viewStartY; d < viewEndY; d++) {
+
+				for (int m1 = 0; m1 < magnification; ++m1)
+					for (int m2 = 0; m2 < magnification; ++m2)
+					{
+						dustImage[3 * (MAX_SIZE * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 0] = (GLubyte)(myWorld[c][d] >= 0 ? (int)(1 * ((myWorld[c][d] + 2)*(myWorld[c][d] + 2)*(myWorld[c][d] + 2))) % 255 : 255);
+						dustImage[3 * (MAX_SIZE * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 1] = (GLubyte)(myWorld[c][d] >= 0 ? (int)(100 * (myWorld[c][d] + 1) % 255) : 255);
+						dustImage[3 * (MAX_SIZE * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 2] = (GLubyte)(myWorld[c][d] >= 0 ? (int)(200 * ((myWorld[c][d] + 2)*(myWorld[c][d] + 2))) % 255 : 255);
+					}
+			}
+		}
+	}
+	return dustImage;
+
+}
+
+void world::setView(int Sx, int Sy, int Ex, int Ey)
+{
+	//Assume cartesian coords are sent here 
+
+	int tSx = cartX_to_MatX(Sx, Sy);
+	int tSy = cartY_to_MatY(Sx, Sy);
+
+	int tEx = cartX_to_MatX(Ex, Ey);
+	int tEy = cartY_to_MatY(Ex, Ey);
+
+	viewStartX = tSx;
+	viewStartY = tSy;
+	viewEndX = tEx;
+	viewEndY = tEy;
+}
+
+int world::getMagnification()
+{
+	return magnification;
+}
+
+void world::setMagnification(int M)
+{
+
+	magnification = M;
+}
+
+void world::resetView()
+{
+	viewStartX = 0;
+	viewStartY = 0;
+	viewEndX = myXMax;
+	viewEndY = myYMax;
+	magnification = 1;
+}

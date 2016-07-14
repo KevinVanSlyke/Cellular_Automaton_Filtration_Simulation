@@ -81,8 +81,6 @@ public:
 	int getIDByVecLoc(int n);
 	int newUniqueID();			//Returns an int then incriments uniqueID
 	int getVecLocByID(int id);
-	void incrementHandled();
-	void resetHandled();
 	void dust_dstr();
 	void setNewTotal();
 
@@ -148,7 +146,6 @@ private:
 	dust_grain newlySplitGrain;
 	std::vector < dust_grain > grainsToAdd;
 	int uniqueID;
-	int ptclsHandled;
 
 	std::string procOutputFolder;
 

@@ -48,8 +48,7 @@ public:
 	void populateWorld(int numDust, int low, int high);
 	void populateWorld(int numDust, int low, int high, int filterGap, int filterWidth, int filterLength);
 	void populateWorld(int numDust, int low, int high, int filterGap, int filterWidth, int filterLength, int filter2Gap, int filter2Width, int filter2Length);
-
-//	void shakefilter(int filterGap, int filterWidth, int filterLength, float timeF);
+	void bimodalPopulateWorld(int numDust, int low1, int high1, int low2, int high2, int filterGap, int filterWidth, int filterLength);
 	void takeStep();
 
 	void writingDust(); //tracking dust particles

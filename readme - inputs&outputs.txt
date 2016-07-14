@@ -13,7 +13,7 @@ Filter2Width Filter2Gap Filter2Length
 
 Outputs:
 1) dustCount.txt
-At every timestep: # Dust moving, stuck, too large to move, merged, and total
+At every timestep: # Dust moving, stuck, pseudo-stuck (not moving near filter), too large to move, merged, total, handled
 
 2) dustDist.txt
 Distribution of sizes and widths

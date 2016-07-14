@@ -65,15 +65,15 @@ parameterReader::parameterReader()
 			}
 			case 7:
 			{
-				iss >> trialID;
-				std::cout << "Line " << lnNum << " reads: TrialID = " << trialID << "." << std::endl;
+				iss >> FilterWidth >> FilterGap >> FilterLength;
+				std::cout << "Line " << lnNum << " reads: FilterWidth = " << FilterWidth << ", FilterGap = " << FilterGap << ", FilterLength = " << FilterLength << "." << std::endl;
+				Filter = true;
 				break;
 			}
 			case 8:
 			{
-				iss >> FilterWidth >> FilterGap >> FilterLength;
-				std::cout << "Line " << lnNum << " reads: FilterWidth = " << FilterWidth << ", FilterGap = " << FilterGap << ", FilterLength = " << FilterLength << "." << std::endl;
-				Filter = true;
+				iss >> trialID;
+				std::cout << "Line " << lnNum << " reads: TrialID = " << trialID << "." << std::endl;
 				break;
 			}
 			case 9:

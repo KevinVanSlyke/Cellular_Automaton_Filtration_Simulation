@@ -184,6 +184,26 @@ void world::populateWorld(int numDust, int low, int high, int filterGap, int fil
 
 }
 
+void world::bimodalPopulateWorld(int numDust, int low1, int high1, int low2, int high2, int filterGap, int filterWidth, int filterLength)
+{
+	std::cout << "Populating World!" << std::endl;
+
+	myList->addGrain(filterGap, filterWidth, filterLength); //add first filter
+
+	while (myList->getTotal() <= numDust/2)
+	{
+		myList->addGrain(low1, high1);
+//		std::cout << "-";
+	}
+	while (myList->getTotal() <= numDust)
+	{
+		myList->addGrain(low2, high2);
+//		std::cout << "-";
+	}
+	std::cout << std::endl;
+
+}
+
 //As above, but also adds a second filter in addition to the first
 //Probably not needed, could just call the previous function again with different inputs
 void world::populateWorld(int numDust, int low, int high, int filterGap, int filterWidth, int filterLength, int  filter2Gap, int filter2Width, int filter2Length)
