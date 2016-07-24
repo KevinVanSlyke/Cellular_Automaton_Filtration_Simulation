@@ -31,10 +31,10 @@ dust_grain::dust_grain()
 	width = -1;
 	maxXStep = -1;
 	maxYStep = -1;
-	prevXVel = -1;
-	prevYVel = -1;
-	colXVel = 0;
-	colYVel = 0;
+	prevXMom = -1;
+	prevYMom = -1;
+	colXMom = 0;
+	colYMom = 0;
 }
 
 //Constructor with parameters
@@ -55,10 +55,10 @@ dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size)
 	width = -1;
 	maxXStep = -1;
 	maxYStep = -1;
-	prevXVel = -1;
-	prevYVel = -1;
-	colXVel = 0;
-	colYVel = 0;
+	prevXMom = -1;
+	prevYMom = -1;
+	colXMom = 0;
+	colYMom = 0;
 }
 
 dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size, int id)
@@ -78,10 +78,10 @@ dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size, int id)
 	width = -1;
 	maxXStep = -1;
 	maxYStep = -1;
-	prevXVel = -1;
-	prevYVel = -1;
-	colXVel = 0;
-	colYVel = 0;
+	prevXMom = -1;
+	prevYMom = -1;
+	colXMom = 0;
+	colYMom = 0;
 	//Debug Line
 	//std::cout << "Grain ID " << grainID << " created." << std::endl;
 }
@@ -105,10 +105,10 @@ dust_grain::dust_grain(const dust_grain  & d)
 	width = d.width;
 	maxXStep = d.maxXStep;
 	maxYStep = d.maxYStep;
-	prevXVel = d.prevXVel;
-	prevYVel = d.prevYVel;
-	colXVel = d.colXVel;
-	colYVel = d.colYVel;
+	prevXMom = d.prevXMom;
+	prevYMom = d.prevYMom;
+	colXMom = d.colXMom;
+	colYMom = d.colYMom;
 }
 
 //Destructor.
@@ -138,10 +138,10 @@ dust_grain ::operator = (const dust_grain  & rhs)
 		width = rhs.width;
 		maxXStep = rhs.maxXStep;
 		maxYStep = rhs.maxYStep;
-		prevXVel = rhs.prevXVel;
-		prevYVel = rhs.prevYVel;
-		colXVel = rhs.colXVel;
-		colYVel = rhs.colYVel;
+		prevXMom = rhs.prevXMom;
+		prevYMom = rhs.prevYMom;
+		colXMom = rhs.colXMom;
+		colYMom = rhs.colYMom;
 	}
 	return *this;
 }
@@ -176,24 +176,24 @@ bool dust_grain::spotTaken(int x, int y)
 	return false;
 }
 
-int dust_grain::getColXVel()
+int dust_grain::getColXMom()
 {
-	return colXVel;
+	return colXMom;
 }
 
-int dust_grain::getColYVel()
+int dust_grain::getColYMom()
 {
-	return colYVel;
+	return colYMom;
 }
 
-void dust_grain::setColXVel(int cXV)
+void dust_grain::setColXMom(int cXMom)
 {
-	colXVel = cXV;
+	colXMom = cXMom;
 }
 
-void dust_grain::setColYVel(int cYV)
+void dust_grain::setColYMom(int cYMom)
 {
-	colYVel = cYV;
+	colYMom = cYMom;
 }
 //Moves the location of a single dust particle.
 void dust_grain::moveStep(int x, int y)
@@ -326,14 +326,14 @@ std::vector <int> dust_grain::getYent()
 	return myY;
 }
 
-int dust_grain::getPrevYVel()
+int dust_grain::getPrevYMom()
 {
-	return prevYVel;
+	return prevYMom;
 }
 
-int dust_grain::getPrevXVel()
+int dust_grain::getPrevXMom()
 {
-	return prevXVel;
+	return prevXMom;
 }
 
 int dust_grain::getMaxXStep()
@@ -346,14 +346,14 @@ int dust_grain::getMaxYStep()
 	return maxYStep;
 }
 
-void dust_grain::setPrevYVel(int yVel)
+void dust_grain::setPrevYMom(int yMom)
 {
-	prevYVel = yVel;
+	prevYMom = yMom;
 }
 
-void dust_grain::setPrevXVel(int xVel)
+void dust_grain::setPrevXMom(int xMom)
 {
-	prevXVel = xVel;
+	prevXMom = xMom;
 }
 
 int dust_grain::calculateWidth()

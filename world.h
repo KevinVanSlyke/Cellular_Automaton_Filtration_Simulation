@@ -27,7 +27,7 @@ public:
 
 	// constructors/destructor 
 	world();                   // default constructor (size==500) 
-	world(int x, int y, int xSpeed, int ySpeed);       // initial size of world 
+	world(int xSites, int ySites, int xMom, int yMom, int negYMom);       // initial size of world 
 	world(const world & w);         // copy constructor 
 	~world();                       // destructor 
 
@@ -60,8 +60,9 @@ public:
 
 private:
 	//random_gen * myGenerator; 
-	int myxSpeed, myySpeed;
-	int  myXMax, myYMax;                            //World Size 
+	int myXMom, myYMom;
+	int myXSites, myYSites;                            //World Size 
+	int myNegYMom;
 	int ** myWorld;
 
 	std::string procOutputFolder;

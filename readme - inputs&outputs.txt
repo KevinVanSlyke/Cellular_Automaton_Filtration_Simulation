@@ -1,8 +1,8 @@
 Inputs:
 i) parameters.txt
 Parameters are read from top to bottom as follows:
-xMax yMax (horizontal/width of simulation area) (vertical/height of simulation area)
-xSpeed ySpeed (maximum movement of particle in the given dimension)
+xSites ySites (horizontal/width of simulation area in # of lattice sites) (vertical/height of simulation area)
+xMom yMom yNegMom (max momomentum of particle in the given dimension that can be randomly caused by the fluid, min x mom = -xMom, third option tells reverse y momentum)
 totalGrains 
 MinGrainSize MaxGrainSize
 maxTimeSteps

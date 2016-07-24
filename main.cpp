@@ -61,172 +61,176 @@ int main(int argc, char *argv[])
 	Filter Parameters: Length, Width of Slits, Width of Gaps
 	trialID
 	*/
-	int filter, xMax, yMax, xSpeed, ySpeed, totalGrains, MinGrainSize, MaxGrainSize, MaxTime, sticking, splitting, merging, FilterWidth, FilterGap, FilterLength, Filter2Width, Filter2Gap, Filter2Length;
+	int filter, xSites, ySites, xMom, yMom, negYMom, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, filterLength, filter2Width, filter2Gap, filter2Length;
 	bool enableSticking, enableSplitting, enableMerging;
-	if (argc < 12)
+	if (argc != 14 || argc != 17 || argc != 20)
 	{
-		std::cout << "Not enough parameters passed to main (Need 11, 14 or 17 integers after the executable name), trying to read from parameters.txt... " << std::endl;
+		std::cout << "Not enough parameters passed to main (Need 13, 16 or 19 integers after the executable name), trying to read from parameters.txt... " << std::endl;
 		parameterReader *pR = new parameterReader();
-		xMax = pR->getxMax();
-		yMax = pR->getyMax();
-		xSpeed = pR->getxSpeed();
-		ySpeed = pR->getySpeed();
+		xSites = pR->getXSites();
+		ySites = pR->getYSites();
+		xMom = pR->getXMom();
+		yMom = pR->getYMom();
+		negYMom = pR->getNegYMom();
 		totalGrains = pR->gettotalGrains();
-		MaxTime = pR->getMaxTime();
+		maxTime = pR->getMaxTime();
 		enableSticking = pR->getSticking();
 		enableSplitting = pR->getSplitting();
 		enableMerging = pR->getMerging();
-		MinGrainSize = pR->getMinGrainSize();
-		MaxGrainSize = pR->getMaxGrainSize();
-		FilterWidth = pR->getFilterWidth();
-		FilterGap = pR->getFilterGap();
-		FilterLength = pR->getFilterLength();
-		Filter2Width = pR->getFilter2Width();
-		Filter2Gap = pR->getFilter2Gap();
-		Filter2Length = pR->getFilter2Length();
+		minGrainSize = pR->getMinGrainSize();
+		maxGrainSize = pR->getMaxGrainSize();
+		filterWidth = pR->getFilterWidth();
+		filterGap = pR->getFilterGap();
+		filterLength = pR->getFilterLength();
+		filter2Width = pR->getFilter2Width();
+		filter2Gap = pR->getFilter2Gap();
+		filter2Length = pR->getFilter2Length();
 		trialID = pR->getTrialID();
 	}
-	else if(argc == 13)
+	else if(argc == 14)
 	{
-		xMax = atof(argv[1]);
-		yMax = atof(argv[2]);
-		xSpeed = atof(argv[3]);
-		ySpeed = atof(argv[4]);
-		totalGrains = atof(argv[5]);
-		MinGrainSize = atof(argv[6]);
-		MaxGrainSize = atof(argv[7]);
-		MaxTime = atof(argv[8]);
-		sticking = atof(argv[9]);
+		xSites = atof(argv[1]);
+		ySites = atof(argv[2]);
+		xMom = atof(argv[3]);
+		yMom = atof(argv[4]);
+		negYMom = atof(argv[5]);
+		totalGrains = atof(argv[6]);
+		minGrainSize = atof(argv[7]);
+		maxGrainSize = atof(argv[8]);
+		maxTime = atof(argv[9]);
+		sticking = atof(argv[10]);
 		if (sticking == 1)
 			enableSticking = true;
 		else
 			enableSticking = false;
-		splitting = atof(argv[10]);
+		splitting = atof(argv[11]);
 		if (splitting == 1)
 			enableSplitting = true;
 		else
 			enableSplitting = false;
-		merging = atof(argv[11]);
+		merging = atof(argv[12]);
 		if (merging == 1)
 			enableMerging = true;
 		else
 			enableMerging = false;
-		trialID = atof(argv[12]);
-		FilterWidth = -1;
-		FilterGap = -1;
-		FilterLength = -1;
-		Filter2Width = -1;
-		Filter2Gap = -1;
-		Filter2Length = -1;
+		trialID = atof(argv[13]);
+		filterWidth = -1;
+		filterGap = -1;
+		filterLength = -1;
+		filter2Width = -1;
+		filter2Gap = -1;
+		filter2Length = -1;
 		filter = 0;
 	}
-	else if(argc == 16)
+	else if(argc == 17)
 	{
-		xMax = atof(argv[1]);
-		yMax = atof(argv[2]);
-		xSpeed = atof(argv[3]);
-		ySpeed = atof(argv[4]);
-		totalGrains = atof(argv[5]);
-		MinGrainSize = atof(argv[6]);
-		MaxGrainSize = atof(argv[7]);
-		MaxTime = atof(argv[8]);
-		sticking = atof(argv[9]);
+		xSites = atof(argv[1]);
+		ySites = atof(argv[2]);
+		xMom = atof(argv[3]);
+		yMom = atof(argv[4]);
+		negYMom = atof(argv[5]);
+		totalGrains = atof(argv[6]);
+		minGrainSize = atof(argv[7]);
+		maxGrainSize = atof(argv[8]);
+		maxTime = atof(argv[9]);
+		sticking = atof(argv[10]);
 		if (sticking == 1)
 			enableSticking = true;
 		else
 			enableSticking = false;
-		splitting = atof(argv[10]);
+		splitting = atof(argv[11]);
 		if (splitting == 1)
 			enableSplitting = true;
 		else
 			enableSplitting = false;
-		merging = atof(argv[11]);
+		merging = atof(argv[12]);
 		if (merging == 1)
 			enableMerging = true;
 		else
 			enableMerging = false;
-		FilterWidth = atof(argv[12]);
-		FilterGap = atof(argv[13]);
-		FilterLength = atof(argv[14]);
-		trialID = atof(argv[15]);
-		Filter2Width = -1;
-		Filter2Gap = -1;
-		Filter2Length = -1;
+		filterWidth = atof(argv[13]);
+		filterGap = atof(argv[14]);
+		filterLength = atof(argv[15]);
+		trialID = atof(argv[16]);
+		filter2Width = -1;
+		filter2Gap = -1;
+		filter2Length = -1;
 		filter = 1;
 	}
-	else if(argc == 19)
+	else if(argc == 20)
 	{
-		xMax = atof(argv[1]);
-		yMax = atof(argv[2]);
-		xSpeed = atof(argv[3]);
-		ySpeed = atof(argv[4]);
-		totalGrains = atof(argv[5]);
-		MinGrainSize = atof(argv[6]);
-		MaxGrainSize = atof(argv[7]);
-		MaxTime = atof(argv[8]);
-		sticking = atof(argv[9]);
+		xSites = atof(argv[1]);
+		ySites = atof(argv[2]);
+		xMom = atof(argv[3]);
+		yMom = atof(argv[4]);
+		negYMom = atof(argv[5]);
+		totalGrains = atof(argv[6]);
+		minGrainSize = atof(argv[7]);
+		maxGrainSize = atof(argv[8]);
+		maxTime = atof(argv[9]);
+		sticking = atof(argv[10]);
 		if (sticking == 1)
 			enableSticking = true;
 		else
 			enableSticking = false;
-		splitting = atof(argv[10]);
+		splitting = atof(argv[11]);
 		if (splitting == 1)
 			enableSplitting = true;
 		else
 			enableSplitting = false;
-		merging = atof(argv[11]);
+		merging = atof(argv[12]);
 		if (merging == 1)
 			enableMerging = true;
 		else
 			enableMerging = false;
-		FilterWidth = atof(argv[12]);
-		FilterGap = atof(argv[13]);
-		FilterLength = atof(argv[14]);
-		Filter2Width = atof(argv[15]);
-		Filter2Gap = atof(argv[16]);
-		Filter2Length = atof(argv[17]);
-		trialID = atof(argv[18]);
+		filterWidth = atof(argv[13]);
+		filterGap = atof(argv[14]);
+		filterLength = atof(argv[15]);
+		filter2Width = atof(argv[16]);
+		filter2Gap = atof(argv[17]);
+		filter2Length = atof(argv[18]);
+		trialID = atof(argv[19]);
 		filter = 2;
 	}
 
-	myWorld = new world(xMax, yMax, xSpeed, ySpeed);
+	myWorld = new world(xSites, ySites, xMom, yMom, negYMom);
 	/*Sets the simulation size in the dust_list object for use in dust_list routines*/
 	//TODO: Make arbitrary for any number of filter lines appended to end of parameter text file.
-	if (FilterGap == (-1) && Filter2Gap == (-1))
+	if (filterGap == (-1) && filter2Gap == (-1))
 	{
 		filter = 0;
-		myWorld->populateWorld(totalGrains, MinGrainSize, MaxGrainSize);
+		myWorld->populateWorld(totalGrains, minGrainSize, maxGrainSize);
 		std::cout << "No Filter detected." << std::endl;
 	}
-	else if (FilterGap != (-1) && Filter2Gap == (-1))
+	else if (filterGap != (-1) && filter2Gap == (-1))
 	{
 		bool bimodal = false;
 		filter = 1;
 		if(bimodal)
 		{
-			myWorld->bimodalPopulateWorld(totalGrains, MinGrainSize, MaxGrainSize/4, 3*MaxGrainSize/4, MaxGrainSize, FilterGap, FilterWidth, FilterLength);
+			myWorld->bimodalPopulateWorld(totalGrains, minGrainSize, maxGrainSize/4, 3*maxGrainSize/4, maxGrainSize, filterGap, filterWidth, filterLength);
 		}
 		else
-			myWorld->populateWorld(totalGrains, MinGrainSize, MaxGrainSize, FilterGap, FilterWidth, FilterLength);
-		std::cout << "Filter gap: " << FilterGap << std::endl;
+			myWorld->populateWorld(totalGrains, minGrainSize, maxGrainSize, filterGap, filterWidth, filterLength);
+		std::cout << "Filter gap: " << filterGap << std::endl;
 	}
-	else if (FilterGap != (-1) && Filter2Gap != (-1))
+	else if (filterGap != (-1) && filter2Gap != (-1))
 	{
 		filter = 2;
-		myWorld->populateWorld(totalGrains, MinGrainSize, MaxGrainSize, FilterGap, FilterWidth, FilterLength, Filter2Gap, Filter2Width, Filter2Length);
-		std::cout << "Filter 1 gap: " << FilterGap << std::endl;
-		std::cout << "Filter 2 gap: " << Filter2Gap << std::endl;
+		myWorld->populateWorld(totalGrains, minGrainSize, maxGrainSize, filterGap, filterWidth, filterLength, filter2Gap, filter2Width, filter2Length);
+		std::cout << "Filter 1 gap: " << filterGap << std::endl;
+		std::cout << "Filter 2 gap: " << filter2Gap << std::endl;
 	}
 
 	/*  Routine for creating folder, need to make alternate version for Linux file systems*/
 
 	std::cout << "Total No. of Dust Grains =  " << myWorld->myList->getTotal() - filter << std::endl;
-	std::cout << "X Max = " << myWorld->getMaxXSize() << ". Y Max = " << myWorld->getMaxYSize() << ". " << std::endl;
+	std::cout << "X Sites = " << myWorld->getMaxXSize() << ". Y Sites = " << myWorld->getMaxYSize() << ". " << std::endl;
 	//"/gpfs/scratch/kgvansly/"
 	//"/projects/academic/sen/kgvansly/Dust_Data/"
 	//"/home/kevin/Dust_Data/"
 	std::ostringstream oFolder;
-	oFolder << "/home/kevin/Dust_Data/" << filter << "fltrs" << FilterGap << "pr" << FilterWidth << "fbr" << FilterLength << "fl"<< totalGrains << "ptcls" << MinGrainSize << "-" << MaxGrainSize << "dstr" << xMax << "x" << yMax << "y" << xSpeed << "vx" << ySpeed << "vy" << MaxTime << "tm";
+	oFolder << "/home/kevin/Dust_Data/" << filter << "fltrs" << filterGap << "pr" << filterWidth << "fbr" << filterLength << "fl"<< totalGrains << "ptcls" << minGrainSize << "-" << maxGrainSize << "dstr" << xSites << "x" << ySites << "y" << xMom << "Px" << yMom << "Py" << negYMom << "nPy" << maxTime << "tm";
 	std::string outputFolder = oFolder.str();
 
 	if(mkdir(outputFolder.c_str(), S_IRWXU) == -1)
@@ -244,7 +248,7 @@ int main(int argc, char *argv[])
 	{
 		FILE * parameterFile = fopen(paramFile.c_str(), "a");
 		// OUTPUT: dust, size, y-position, y-step, x-localSp, y-localSp
-		fprintf(parameterFile, "%d %d \n%d %d \n%d \n%d %d \n%d \n%d %d %d \n%d %d %d \n%d %d %d", xMax, yMax, xSpeed, ySpeed, totalGrains, MinGrainSize, MaxGrainSize, MaxTime, sticking, splitting, merging, FilterWidth, FilterGap, FilterLength, Filter2Width, Filter2Gap, Filter2Length);
+		fprintf(parameterFile, "%d %d \n%d %d %d\n%d \n%d %d \n%d \n%d %d %d \n%d %d %d \n%d %d %d", xSites, ySites, xMom, yMom, negYMom, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, filterLength, filter2Width, filter2Gap, filter2Length);
 		fclose(parameterFile);
 	}
 
@@ -262,7 +266,7 @@ int main(int argc, char *argv[])
 	//std::cout << "Dust distribution has been calculated." << std::endl;
 
 	/* Runs program for determined amount of time. */
-	while (timeCount < MaxTime)
+	while (timeCount < maxTime)
 	{
 		if (timeCount % 500 == 0)
 			std::cout << "Time in world  = " << timeCount << " " << std::endl;
@@ -280,9 +284,9 @@ int main(int argc, char *argv[])
 	{
 		//writing: time of calculation, number of particles and length/width
 		timeOptimization << "Total runtime is: " << time_s << " seconds." << std::endl;
-		timeOptimization << "For " << MaxTime << "timesteps." << std::endl;
+		timeOptimization << "For " << maxTime << "timesteps." << std::endl;
 		timeOptimization << "Simulation of " << totalGrains << " particles in an area of:" << std::endl;
-		timeOptimization << xMax << " by " << yMax << ". (x by y)" << std::endl;
+		timeOptimization << xSites << " by " << ySites << ". (x by y)" << std::endl;
 		timeOptimization.close();
 	}
 

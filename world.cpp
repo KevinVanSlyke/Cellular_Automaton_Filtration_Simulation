@@ -17,70 +17,74 @@ Dated Jan 2 2016	*/
 //Default constructor
 world::world()
 {
-	myXMax = 500;
-	myYMax = 500;
-	myxSpeed = 10;
-	myySpeed = 10;
+	myXSites = 500;
+	myYSites = 500;
+	myXMom = 10;
+	myYMom = 10;
+	myNegYMom = 0;	
 	
-	myWorld = (int**)malloc(myYMax*sizeof(int*));
-	for (int c = 0; c < myYMax; ++c)
+	myWorld = (int**)malloc(myYSites*sizeof(int*));
+	for (int c = 0; c < myYSites; ++c)
 	{
-		myWorld[c] = (int *)malloc(myXMax*sizeof(int));
-		for (int d = 0; d < myXMax; ++d)
+		myWorld[c] = (int *)malloc(myXSites*sizeof(int));
+		for (int d = 0; d < myXSites; ++d)
 			myWorld[c][d] = -1;
 	}
 	myList = new dust_list(myWorld);
-	myList->setMaxXLoc(myXMax);
-	myList->setMaxYLoc(myYMax);
-	myList->setMaxXVel(myxSpeed);
-	myList->setMaxYVel(myySpeed);
+	myList->setMaxXLoc(myXSites);
+	myList->setMaxYLoc(myYSites);
+	myList->setMaxXMom(myXMom);
+	myList->setMaxYMom(myYMom);
+	myList->setNegYMom(myNegYMom);
 }
 
-//Constructor with size and velocity inputs
-world::world(int x, int y, int xSpeed, int ySpeed)
+//Constructor with size and momentum inputs
+world::world(int x, int y, int XMom, int YMom, int negYMom)
 {
-	myXMax = x;
-	myYMax = y;
+	myXSites = x;
+	myYSites = y;
 
-	myxSpeed = xSpeed;
-	myySpeed = ySpeed;
-
-	myWorld = (int**)malloc(myYMax*sizeof(int*));
-	for (int c = 0; c < myYMax; ++c)
+	myXMom = XMom;
+	myYMom = YMom;
+	myNegYMom = negYMom;
+	myWorld = (int**)malloc(myYSites*sizeof(int*));
+	for (int c = 0; c < myYSites; ++c)
 	{
-		myWorld[c] = (int *)malloc(myXMax*sizeof(int));
-		for (int d = 0; d < myXMax; ++d)
+		myWorld[c] = (int *)malloc(myXSites*sizeof(int));
+		for (int d = 0; d < myXSites; ++d)
 			myWorld[c][d] = -1;
 	}
 	myList = new dust_list(myWorld);
-	myList->setMaxXLoc(myXMax);
-	myList->setMaxYLoc(myYMax);
-	myList->setMaxXVel(myxSpeed);
-	myList->setMaxYVel(myySpeed);
+	myList->setMaxXLoc(myXSites);
+	myList->setMaxYLoc(myYSites);
+	myList->setMaxXMom(myXMom);
+	myList->setMaxYMom(myYMom);
+	myList->setNegYMom(myNegYMom);
 }
 
 // Copy constructor 
 world::world(const world  & w)
 {
-	for (int c = 0; c < myXMax; ++c)
+	for (int c = 0; c < myXSites; ++c)
 	{
 		free(myWorld[c]);
 	}
 	free(myWorld);
 	delete myList;
-	myXMax = myYMax = 0;
+	myXSites = myYSites = 0;
 
-	myXMax = w.myXMax;
-	myYMax = w.myYMax;
+	myXSites = w.myXSites;
+	myYSites = w.myYSites;
 
-	myxSpeed = w.myxSpeed;
-	myySpeed = w.myySpeed;
+	myXMom = w.myXMom;
+	myYMom = w.myYMom;
+	myNegYMom = w.myNegYMom;
 
-	myWorld = (int**)malloc(myYMax*sizeof(int*));
-	for (int c = 0; c < myYMax; ++c)
+	myWorld = (int**)malloc(myYSites*sizeof(int*));
+	for (int c = 0; c < myYSites; ++c)
 	{
-		myWorld[c] = (int *)malloc(myXMax*sizeof(int));
-		for (int d = 0; d < myXMax; ++d)
+		myWorld[c] = (int *)malloc(myXSites*sizeof(int));
+		for (int d = 0; d < myXSites; ++d)
 			myWorld[c][d] = w.myWorld[c][d];
 	}
 	myList = w.myList;
@@ -89,13 +93,13 @@ world::world(const world  & w)
 // Destructor, frees memory 
 world ::~world()
 {
-	for (int c = 0; c < myYMax; ++c)
+	for (int c = 0; c < myYSites; ++c)
 	{
 		free(myWorld[c]);
 	}
 	free(myWorld);
 
-	myxSpeed = myySpeed = myXMax = myYMax = 0;
+	myXMom = myYMom = myNegYMom = myXSites = myYSites = 0;
 	delete myList;
 }
 
@@ -104,25 +108,25 @@ world ::operator = (const world  & rhs)
 {
 	if (this != &rhs)                           // don't assign to self! 
 	{
-		for (int c = 0; c < myXMax; ++c)
+		for (int c = 0; c < myXSites; ++c)
 		{
 			free(myWorld[c]);
 		}
 		free(myWorld);
 		delete myList;
 
-		myxSpeed = myySpeed = myXMax = myYMax = 0;
+		myXMom = myYMom = myNegYMom = myXSites = myYSites = 0;
 
-		myXMax = rhs.myXMax;
-		myYMax = rhs.myYMax;
+		myXSites = rhs.myXSites;
+		myYSites = rhs.myYSites;
 
 		myList = rhs.myList;
 
-		myWorld = (int**)malloc(myYMax*sizeof(int*));
-		for (int c = 0; c < myYMax; ++c)
+		myWorld = (int**)malloc(myYSites*sizeof(int*));
+		for (int c = 0; c < myYSites; ++c)
 		{
-			myWorld[c] = (int *)malloc(myXMax*sizeof(int));
-			for (int d = 0; d < myXMax; ++d)
+			myWorld[c] = (int *)malloc(myXSites*sizeof(int));
+			for (int d = 0; d < myXSites; ++d)
 				myWorld[c][d] = rhs.myWorld[c][d];
 		}
 	}
@@ -136,7 +140,7 @@ void world::setWorld(int x, int y, int id)
 
 int world::grainNumAt(int x, int y)
 {
-	if ( x < myXMax && y < myYMax)
+	if ( x < myXSites && y < myYSites)
 		return myWorld[y][x];
 	else
 	{
@@ -148,12 +152,12 @@ int world::grainNumAt(int x, int y)
 
 int world::getMaxXSize()
 {
-	return myXMax;
+	return myXSites;
 }
 
 int world::getMaxYSize()
 {
-	return myYMax;
+	return myYSites;
 }
 
 //Adds dust grains one at a time until the number of grians specified by a parameter is reached.

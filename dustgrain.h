@@ -46,22 +46,22 @@ public:
 	int getSize();
 	int getXatc(int c);
 	int getYatc(int c);
-	int getPrevYVel();
-	int getPrevXVel();
+	int getPrevYMom();
+	int getPrevXMom();
 	int getID();
 	int getPrevPB();
 	int getCurPB();
 	int getMaxXStep();
 	int getMaxYStep();
-	int getColXVel();
-	int getColYVel();
+	int getColXMom();
+	int getColYMom();
 	std::vector <int> getXent();
 	std::vector <int> getYent();
 	
 	// Simple modifiers
 	void setSize();
-	void setPrevYVel(int yVel);
-	void setPrevXVel(int xVel);
+	void setPrevYMom(int yMom);
+	void setPrevXMom(int xMom);
 	void setID(int newID);
 	void setStuck(bool stk);
 	void setPrevPB(int num);
@@ -73,8 +73,8 @@ public:
 	void setMaxYLoc(int yLen);
 	void setMaxXStep(int mXStep);
 	void setMaxYStep(int mYStep);
-	void setColXVel(int cXV);
-	void setColYVel(int cYV);
+	void setColXMom(int cXMom);
+	void setColYMom(int cYMom);
 	// Complex Modifiers
 	void moveStep(int x, int y);
 	void growGrain(std::vector <int> x, std::vector <int> y);
@@ -100,10 +100,10 @@ private:
 	int width;
 	int maxXStep;
 	int maxYStep;
-	int prevXVel;
-	int prevYVel;
-	int colXVel;
-	int colYVel;
+	int prevXMom;
+	int prevYMom;
+	int colXMom;
+	int colYMom;
 	std::vector<int> myX, myY;
 };
 #define DUST_GRAIN_H 

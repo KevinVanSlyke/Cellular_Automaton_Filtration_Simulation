@@ -18,10 +18,11 @@ class parameterReader
 {
 public:
 	parameterReader();
-	int getxMax();
-	int getyMax();
-	int getxSpeed();
-	int getySpeed();
+	int getXSites();
+	int getYSites();
+	int getXMom();
+	int getYMom();
+	int getNegYMom();
 	int gettotalGrains();
 	int getMaxGrainSize();
 	int getMinGrainSize();
@@ -38,22 +39,23 @@ public:
 	int getTrialID();
 
 private:
-	int xMax;
-	int yMax;
-	int xSpeed;
-	int ySpeed;
+	int xSites;
+	int ySites;
+	int xMom;
+	int yMom;
+	int negYMom;
 	int totalGrains;
-	int MaxGrainSize;
-	int MinGrainSize;
-	int MaxTime;
-	int FilterWidth;
-	int FilterGap;
-	int FilterLength;
-	int Filter2Width;
-	int Filter2Gap;
-	int Filter2Length;
-	bool Filter;
-	bool Filter2;
+	int maxGrainSize;
+	int minGrainSize;
+	int maxTime;
+	int filterWidth;
+	int filterGap;
+	int filterLength;
+	int filter2Width;
+	int filter2Gap;
+	int filter2Length;
+	bool filter;
+	bool filter2;
 	int sticking;
 	int splitting;
 	int merging;

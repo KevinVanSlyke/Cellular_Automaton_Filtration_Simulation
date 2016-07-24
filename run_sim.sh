@@ -14,12 +14,13 @@ make dust_simulation
 ((spacing = 6))
 ((gap = 9))
 ((depth = 3))
-((vx = 4*$max))
-((vy = 4*$max))
+((Px = 4*$max))
+((Py = 4*$max))
+((nPy = 4*$max))
 echo "Launching dust filtration simulation(s)..."
 for ((id=0; id<1; id=id+1))
 do
-	echo "Running ./dust_simulation "$X" "$Y" "$vx" "$vy" "$num" "$min" "$max" "$t" "$stick" "$splt" "$mrg" "$spacing" "$gap" "$depth" "$id
-	./dust_simulation $X $Y $vx $vy $num $min $max $t $stick $splt $mrg $spacing $gap $depth $id
+	echo "Running ./dust_simulation "$X" "$Y" "$Px" "$Py" "$nPy" "$num" "$min" "$max" "$t" "$stick" "$splt" "$mrg" "$spacing" "$gap" "$depth" "$id
+	./dust_simulation $X $Y $Px $Py %nPy $num $min $max $t $stick $splt $mrg $spacing $gap $depth $id
 done
 echo "All Done!"

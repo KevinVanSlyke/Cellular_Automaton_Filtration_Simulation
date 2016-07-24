@@ -49,9 +49,9 @@ public:
 
 	int getMaxXLoc();
 	int getMaxYLoc();
-	int getMaxXVel();
-	int getMaxYVel();
-	
+	int getMaxXMom();
+	int getMaxYMom();
+	int getNegYMom();
 	void setPillBoxes(int loc, std::vector< int > pBoxes);
 	void setpBCounts(int loc, int pCounts);
 	void setPoreJamTimer(int loc, int jamTimer);
@@ -60,8 +60,9 @@ public:
 
 	void setMaxXLoc(int maxX);
 	void setMaxYLoc(int maxY);
-	void setMaxXVel(int xvel);
-	void setMaxYVel(int xvel);
+	void setMaxXMom(int yMom);
+	void setMaxYMom(int yMom);
+	void setNegYMom(int negYMom);
 	void resetPBCounts();
 	void resetPotentialBlock();
 	void incrimentPBCounts(int loc);
@@ -124,14 +125,15 @@ private:
 	//Function to calculate size/width statistics
 	std::vector <double> calc_stats(std::vector < std::vector < int > > distribution);
 
-	void calculatePostCollisionVelocities(dust_grain movingPtcl, dust_grain staticPtcl, int movXVelBefore, int movYVelBefore);
+	void calculatePostCollisionMomentum(dust_grain movingPtcl, dust_grain staticPtcl, int movXMomBefore, int movYMomBefore);
 	//Private variables
 	int myTotal;
 	int numTimeSteps;
 	int maxXLoc;
 	int maxYLoc;
-	int maxXVel;
-	int maxYVel;
+	int maxXMom;
+	int maxYMom;
+	int negYMom;
 	bool enableSticking;
 	bool enableMerging;
 	bool enableSplitting;

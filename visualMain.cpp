@@ -18,6 +18,7 @@ Dated Jan 2 2016*/
 #include <math.h>
 #include <errno.h>
 #include <time.h>
+#include <exception>
 
 /*	direct.h for windows filesystem manip
 	unistd.h and sys/stat.h for unix filesystem manip*/
@@ -36,7 +37,7 @@ using namespace std;
 	double time_s;
 
 bool zoom, offvisual = false;
-int myXMax, myYMax, myTMax, myPMax;
+int myXSites, myYSites, myTime, myPtcls;
 world * myWorld;
 int viewStartX = 0;
 int viewStartY = 0;
@@ -54,7 +55,7 @@ int prev_h = 700;
 GLubyte * myWorldImage;
 
 void myIdle();
-void takestep();
+void takeStep();
 void(*Functor)() = myIdle;
 void init();
 void display();
@@ -83,13 +84,13 @@ void myIdle()
 	myWorld->updateWorld();
 }
 
-void takestep()
+void takeStep()
 {
 	++timeCount;
 	myWorld->takeStep();
 	myWorld->updateWorld();
 	myWorld->writingDust(); //tracking dust particles
-	if(timeCount > myTMax)
+	if(timeCount > myTime)
 	{
 		glutDestroyWindow(glutGetWindow());
 		/* Runs program for determined amount of time. */
@@ -103,9 +104,9 @@ void takestep()
 		{
 			//writing: time of calculation, number of particles and length/width
 			timeOptimization << "Total runtime is: " << time_s << " seconds." << std::endl;
-			timeOptimization << "For " << myTMax << "timesteps." << std::endl;
-			timeOptimization << "Simulation of " << myPMax << " particles in an area of:" << std::endl;
-			timeOptimization << myXMax << " by " << myYMax << ". (x by y)" << std::endl;
+			timeOptimization << "For " << myTime << "time steps." << std::endl;
+			timeOptimization << "Simulation of " << myPtcls << " particles in an area of:" << std::endl;
+			timeOptimization << myXSites << " by " << myYSites << ". (x by y)" << std::endl;
 			timeOptimization.close();
 		}
 		std::cout << "Simulation completed!" << std::endl;
@@ -136,9 +137,9 @@ void display(void)
 	glRasterPos2i(0,0);  //Specifies the raster position for pixel operations. 
 
 	myWorldImage = updateWorldImage(myWorld->getWorldArray());
-	glDrawPixels(myXMax, myYMax, GL_RGB, GL_UNSIGNED_BYTE, myWorldImage);
-	GLfloat xZoom = windowWidth/myXMax;
-	GLfloat yZoom = windowHeight/myYMax;
+	glDrawPixels(myXSites, myYSites, GL_RGB, GL_UNSIGNED_BYTE, myWorldImage);
+	GLfloat xZoom = windowWidth/myXSites;
+	GLfloat yZoom = windowHeight/myYSites;
 	glPixelZoom(xZoom, yZoom);
 //	glPixelZoom(1.0, 1.0); //zooming display region, original factor=1,1 
 
@@ -150,8 +151,8 @@ void reshape(int w, int h)
 {
 	windowWidth = w;
 	windowHeight = h;
-	GLfloat xZoom = windowWidth/myXMax;
-	GLfloat yZoom = windowHeight/myYMax;
+	GLfloat xZoom = windowWidth/myXSites;
+	GLfloat yZoom = windowHeight/myYSites;
 	glPixelZoom(xZoom, yZoom);
 	glViewport((GLint)-windowWidth/2, (GLint)-windowHeight/2, (GLsizei)windowWidth, (GLsizei)windowHeight);
 }
@@ -167,13 +168,13 @@ GLubyte * updateWorldImage(int ** worldArray)   // GLubyte * <declare "getWorldI
 	if (viewStartX < viewEndX && viewStartY < viewEndY)
 	{
 
-		for (int c = 0; c < myXMax; c++)
+		for (int c = 0; c < myXSites; c++)
 		{
-			for (int d = 0; d < myYMax; d++)
+			for (int d = 0; d < myYSites; d++)
 			{
-				worldImage[3 * (myXMax * (c)+d) + 0] = (GLubyte)0;
-				worldImage[3 * (myXMax * (c)+d) + 1] = (GLubyte)0;
-				worldImage[3 * (myXMax * (c)+d) + 2] = (GLubyte)0;
+				worldImage[3 * (myXSites * (c)+d) + 0] = (GLubyte)0;
+				worldImage[3 * (myXSites * (c)+d) + 1] = (GLubyte)0;
+				worldImage[3 * (myXSites * (c)+d) + 2] = (GLubyte)0;
 			}
 		}
 		for (int c = viewStartX; c < viewEndX; c++) 
@@ -184,9 +185,9 @@ GLubyte * updateWorldImage(int ** worldArray)   // GLubyte * <declare "getWorldI
 				{
 					for (int m2 = 0; m2 < magnification; ++m2)
 					{
-						worldImage[3 * (myXMax * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 0] = (GLubyte)(worldArray[c][d] >= 0 ? (int)(1 * ((worldArray[c][d] + 2)*(worldArray[c][d] + 2)*(worldArray[c][d] + 2))) % 255 : 255);
-						worldImage[3 * (myXMax * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 1] = (GLubyte)(worldArray[c][d] >= 0 ? (int)(100 * (worldArray[c][d] + 1) % 255) : 255);
-						worldImage[3 * (myXMax * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 2] = (GLubyte)(worldArray[c][d] >= 0 ? (int)(200 * ((worldArray[c][d] + 2)*(worldArray[c][d] + 2))) % 255 : 255);
+						worldImage[3 * (myXSites * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 0] = (GLubyte)(worldArray[c][d] >= 0 ? (int)(1 * ((worldArray[c][d] + 2)*(worldArray[c][d] + 2)*(worldArray[c][d] + 2))) % 255 : 255);
+						worldImage[3 * (myXSites * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 1] = (GLubyte)(worldArray[c][d] >= 0 ? (int)(100 * (worldArray[c][d] + 1) % 255) : 255);
+						worldImage[3 * (myXSites * (magnification*(c - viewStartX) + m1) + magnification*(d - viewStartY) + m2) + 2] = (GLubyte)(worldArray[c][d] >= 0 ? (int)(200 * ((worldArray[c][d] + 2)*(worldArray[c][d] + 2))) % 255 : 255);
 					}
 				}
 			}
@@ -208,14 +209,14 @@ void resetView()
 {
 	viewStartX = 0;
 	viewStartY = 0;
-	viewEndX = myXMax;
-	viewEndY = myYMax;
+	viewEndX = myXSites;
+	viewEndY = myYSites;
 	magnification = 1;
 }
 
 void initWorldImage()
 {
-	myWorldImage = new GLubyte[myXMax * myYMax * 3];
+	myWorldImage = new GLubyte[myXSites * myYSites * 3];
 }
 
 // *******
@@ -241,16 +242,17 @@ int main(int argc, char *argv[])
 	Filter Parameters: Length, Width of Slits, Width of Gaps
 	trialID
 	*/
-	int filter, xMax, yMax, xSpeed, ySpeed, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, FilterLength, filter2Width, filter2Gap, Filter2Length;
+	int filter, xSites, ySites, xMom, yMom, negYMom, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, filterLength, filter2Width, filter2Gap, filter2Length;
 	bool enableSticking, enableSplitting, enableMerging;
-	if (argc < 12)
+	if (argc != 14 || argc != 17 || argc != 20)
 	{
-		std::cout << "Not enough parameters passed to main (Need 11, 14 or 17 integers after the executable name), trying to read from parameters.txt... " << std::endl;
+		std::cout << "Not enough parameters passed to main (Need 13, 16 or 19 integers after the executable name), trying to read from parameters.txt... " << std::endl;
 		parameterReader *pR = new parameterReader();
-		xMax = pR->getxMax();
-		yMax = pR->getyMax();
-		xSpeed = pR->getxSpeed();
-		ySpeed = pR->getySpeed();
+		xSites = pR->getXSites();
+		ySites = pR->getYSites();
+		xMom = pR->getXMom();
+		yMom = pR->getYMom();
+		negYMom = pR->getNegYMom();
 		totalGrains = pR->gettotalGrains();
 		maxTime = pR->getMaxTime();
 		enableSticking = pR->getSticking();
@@ -260,122 +262,126 @@ int main(int argc, char *argv[])
 		maxGrainSize = pR->getMaxGrainSize();
 		filterWidth = pR->getFilterWidth();
 		filterGap = pR->getFilterGap();
-		FilterLength = pR->getFilterLength();
+		filterLength = pR->getFilterLength();
 		filter2Width = pR->getFilter2Width();
 		filter2Gap = pR->getFilter2Gap();
-		Filter2Length = pR->getFilter2Length();
+		filter2Length = pR->getFilter2Length();
 		trialID = pR->getTrialID();
+
 	}
-	else if(argc == 13)
+	else if(argc == 14)
 	{
-		xMax = atof(argv[1]);
-		yMax = atof(argv[2]);
-		xSpeed = atof(argv[3]);
-		ySpeed = atof(argv[4]);
-		totalGrains = atof(argv[5]);
-		minGrainSize = atof(argv[6]);
-		maxGrainSize = atof(argv[7]);
-		maxTime = atof(argv[8]);
-		sticking = atof(argv[9]);
+		xSites = atof(argv[1]);
+		ySites = atof(argv[2]);
+		xMom = atof(argv[3]);
+		yMom = atof(argv[4]);
+		negYMom = atof(argv[5]);
+		totalGrains = atof(argv[6]);
+		minGrainSize = atof(argv[7]);
+		maxGrainSize = atof(argv[8]);
+		maxTime = atof(argv[9]);
+		sticking = atof(argv[10]);
 		if (sticking == 1)
 			enableSticking = true;
 		else
 			enableSticking = false;
-		splitting = atof(argv[10]);
+		splitting = atof(argv[11]);
 		if (splitting == 1)
 			enableSplitting = true;
 		else
 			enableSplitting = false;
-		merging = atof(argv[11]);
+		merging = atof(argv[12]);
 		if (merging == 1)
 			enableMerging = true;
 		else
 			enableMerging = false;
-		trialID = atof(argv[12]);
+		trialID = atof(argv[13]);
 		filterWidth = -1;
 		filterGap = -1;
-		FilterLength = -1;
+		filterLength = -1;
 		filter2Width = -1;
 		filter2Gap = -1;
-		Filter2Length = -1;
+		filter2Length = -1;
 		filter = 0;
 	}
-	else if(argc == 16)
+	else if(argc == 17)
 	{
-		xMax = atof(argv[1]);
-		yMax = atof(argv[2]);
-		xSpeed = atof(argv[3]);
-		ySpeed = atof(argv[4]);
-		totalGrains = atof(argv[5]);
-		minGrainSize = atof(argv[6]);
-		maxGrainSize = atof(argv[7]);
-		maxTime = atof(argv[8]);
-		sticking = atof(argv[9]);
+		xSites = atof(argv[1]);
+		ySites = atof(argv[2]);
+		xMom = atof(argv[3]);
+		yMom = atof(argv[4]);
+		negYMom = atof(argv[5]);
+		totalGrains = atof(argv[6]);
+		minGrainSize = atof(argv[7]);
+		maxGrainSize = atof(argv[8]);
+		maxTime = atof(argv[9]);
+		sticking = atof(argv[10]);
 		if (sticking == 1)
 			enableSticking = true;
 		else
 			enableSticking = false;
-		splitting = atof(argv[10]);
+		splitting = atof(argv[11]);
 		if (splitting == 1)
 			enableSplitting = true;
 		else
 			enableSplitting = false;
-		merging = atof(argv[11]);
+		merging = atof(argv[12]);
 		if (merging == 1)
 			enableMerging = true;
 		else
 			enableMerging = false;
-		filterWidth = atof(argv[12]);
-		filterGap = atof(argv[13]);
-		FilterLength = atof(argv[14]);
-		trialID = atof(argv[15]);
+		filterWidth = atof(argv[13]);
+		filterGap = atof(argv[14]);
+		filterLength = atof(argv[15]);
+		trialID = atof(argv[16]);
 		filter2Width = -1;
 		filter2Gap = -1;
-		Filter2Length = -1;
+		filter2Length = -1;
 		filter = 1;
 	}
-	else if(argc == 19)
+	else if(argc == 20)
 	{
-		xMax = atof(argv[1]);
-		yMax = atof(argv[2]);
-		xSpeed = atof(argv[3]);
-		ySpeed = atof(argv[4]);
-		totalGrains = atof(argv[5]);
-		minGrainSize = atof(argv[6]);
-		maxGrainSize = atof(argv[7]);
-		maxTime = atof(argv[8]);
-		sticking = atof(argv[9]);
+		xSites = atof(argv[1]);
+		ySites = atof(argv[2]);
+		xMom = atof(argv[3]);
+		yMom = atof(argv[4]);
+		negYMom = atof(argv[5]);
+		totalGrains = atof(argv[6]);
+		minGrainSize = atof(argv[7]);
+		maxGrainSize = atof(argv[8]);
+		maxTime = atof(argv[9]);
+		sticking = atof(argv[10]);
 		if (sticking == 1)
 			enableSticking = true;
 		else
 			enableSticking = false;
-		splitting = atof(argv[10]);
+		splitting = atof(argv[11]);
 		if (splitting == 1)
 			enableSplitting = true;
 		else
 			enableSplitting = false;
-		merging = atof(argv[11]);
+		merging = atof(argv[12]);
 		if (merging == 1)
 			enableMerging = true;
 		else
 			enableMerging = false;
-		filterWidth = atof(argv[12]);
-		filterGap = atof(argv[13]);
-		FilterLength = atof(argv[14]);
-		filter2Width = atof(argv[15]);
-		filter2Gap = atof(argv[16]);
-		Filter2Length = atof(argv[17]);
-		trialID = atof(argv[18]);
+		filterWidth = atof(argv[13]);
+		filterGap = atof(argv[14]);
+		filterLength = atof(argv[15]);
+		filter2Width = atof(argv[16]);
+		filter2Gap = atof(argv[17]);
+		filter2Length = atof(argv[18]);
+		trialID = atof(argv[19]);
 		filter = 2;
 	}
-	myXMax = xMax;
-	myYMax = yMax;
-	myTMax = maxTime;
-	myPMax = totalGrains;
+	myXSites = xSites;
+	myYSites = ySites;
+	myTime = maxTime;
+	myPtcls = totalGrains;
 	glutInit(&argc, argv);
 	initWorldImage();
 	
-	myWorld = new world(xMax, yMax, xSpeed, ySpeed);
+	myWorld = new world(xSites, ySites, xMom, yMom, negYMom);
 	//TODO: Make arbitrary for any number of filter lines appended to end of parameter text file.
 	if (filterGap == (-1) && filter2Gap == (-1))
 	{
@@ -386,13 +392,13 @@ int main(int argc, char *argv[])
 	else if (filterGap != (-1) && filter2Gap == (-1))
 	{
 		filter = 1;
-		myWorld->populateWorld(totalGrains, minGrainSize, maxGrainSize, filterGap, filterWidth, FilterLength);
+		myWorld->populateWorld(totalGrains, minGrainSize, maxGrainSize, filterGap, filterWidth, filterLength);
 		std::cout << "Filter gap: " << filterGap << std::endl;
 	}
 	else if (filterGap != (-1) && filter2Gap != (-1))
 	{
 		filter = 2;
-		myWorld->populateWorld(totalGrains, minGrainSize, maxGrainSize, filterGap, filterWidth, FilterLength, filter2Gap, filter2Width, Filter2Length);
+		myWorld->populateWorld(totalGrains, minGrainSize, maxGrainSize, filterGap, filterWidth, filterLength, filter2Gap, filter2Width, filter2Length);
 		std::cout << "Filter 1 gap: " << filterGap << std::endl;
 		std::cout << "Filter 2 gap: " << filter2Gap << std::endl;
 	}
@@ -400,12 +406,12 @@ int main(int argc, char *argv[])
 	/*  Routine for creating folder, need to make alternate version for Linux file systems*/
 
 	std::cout << "Total No. of Dust Grains =  " << myWorld->myList->getTotal() - filter << std::endl;
-	std::cout << "X Max = " << myWorld->getMaxXSize() << ". Y Max = " << myWorld->getMaxYSize() << ". " << std::endl;
+	std::cout << "X Sites = " << myWorld->getMaxXSize() << ". Y Sites = " << myWorld->getMaxYSize() << ". " << std::endl;
 	//"/gpfs/scratch/kgvansly/"
 	//"/projects/academic/sen/kgvansly/Dust_Data/"
 	//"/home/kevin/Dust_Data/"
 	std::ostringstream oFolder;
-	oFolder << "/home/kevin/Dust_Data/" << filter << "fltrs" << filterGap << "pr" << filterWidth << "fbr" << FilterLength << "fl"<< totalGrains << "ptcls" << minGrainSize << "-" << maxGrainSize << "dstr" << xMax << "x" << yMax << "y" << xSpeed << "vx" << ySpeed << "vy" << maxTime << "tm";
+	oFolder << "/home/kevin/Dust_Data/" << filter << "fltrs" << filterGap << "pr" << filterWidth << "fbr" << filterLength << "fl"<< totalGrains << "ptcls" << minGrainSize << "-" << maxGrainSize << "dstr" << xSites << "x" << ySites << "y" << xMom << "Px" << yMom << "Py" << negYMom << "nPy" << maxTime << "tm";
 	std::string outputFolder = oFolder.str();
 
 	if(mkdir(outputFolder.c_str(), S_IRWXU) == -1)
@@ -423,7 +429,7 @@ int main(int argc, char *argv[])
 	{
 		FILE * parameterFile = fopen(paramFile.c_str(), "a");
 		// OUTPUT: dust, size, y-position, y-step, x-localSp, y-localSp
-		fprintf(parameterFile, "%d %d \n%d %d \n%d \n%d %d \n%d \n%d %d %d \n%d %d %d \n%d %d %d", xMax, yMax, xSpeed, ySpeed, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, FilterLength, filter2Width, filter2Gap, Filter2Length);
+		fprintf(parameterFile, "%d %d \n%d %d %d\n%d \n%d %d \n%d \n%d %d %d \n%d %d %d \n%d %d %d", xSites, ySites, xMom, yMom, negYMom, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, filterLength, filter2Width, filter2Gap, filter2Length);
 		fclose(parameterFile);
 	}
 
@@ -453,6 +459,6 @@ int main(int argc, char *argv[])
 
 	glutReshapeFunc(reshape);
 	glutMouseFunc(mouse);
-	glutIdleFunc(takestep);
+	glutIdleFunc(takeStep);
 	glutMainLoop();
 }

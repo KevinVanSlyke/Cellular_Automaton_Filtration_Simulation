@@ -29,14 +29,14 @@ parameterReader::parameterReader()
 		{
 			case 1:
 			{
-				iss >> xMax >> yMax;
-				std::cout << "Line " << lnNum << " reads: xMax = " << xMax << ", yMax = " << yMax << "." << std::endl;
+				iss >> xSites >> ySites;
+				std::cout << "Line " << lnNum << " reads: xSites = " << xSites << ", ySites = " << ySites << "." << std::endl;
 				break;
 			}
 			case 2:
 			{
-				iss >> xSpeed >> ySpeed;
-				std::cout << "Line " << lnNum << " reads: xSpeed = " << xSpeed << ", ySpeed = " << ySpeed << "." << std::endl;
+				iss >> xMom >> yMom >> negYMom;
+				std::cout << "Line " << lnNum << " reads: xMom = " << xMom << ", yMom = " << yMom << ", negYMom = " << negYMom << "." << std::endl;
 				break;
 			}
 			case 3:
@@ -47,40 +47,43 @@ parameterReader::parameterReader()
 			}
 			case 4:
 			{
-				iss >> MinGrainSize >> MaxGrainSize;
-				std::cout << "Line " << lnNum << " reads: MinGrainSize = " << MinGrainSize << ", MaxGrainSize = " << MaxGrainSize << "." << std::endl;
+				iss >> minGrainSize >> maxGrainSize;
+				std::cout << "Line " << lnNum << " reads: minGrainSize = " << minGrainSize << ", maxGrainSize = " << maxGrainSize << "." << std::endl;
 				break;
 			}
 			case 5:
 			{
-				iss >> MaxTime;
-				std::cout << "Line " << lnNum << " reads: MaxTime = " << MaxTime << "." << std::endl;
+				iss >> maxTime;
+				std::cout << "Line " << lnNum << " reads: maxTime = " << maxTime << "." << std::endl;
 				break;
 			}
 			case 6:
 			{
 				iss >> sticking >> splitting >> merging;
-				std::cout << "Line " << lnNum << " reads: Sticking = " << sticking << ", Splitting = " << splitting << ", Merging = " << merging << "." << std::endl;
+				std::cout << "Line " << lnNum << " reads: sticking = " << sticking << ", splitting = " << splitting << ", merging = " << merging << "." << std::endl;
 				break;
 			}
 			case 7:
 			{
-				iss >> FilterWidth >> FilterGap >> FilterLength;
-				std::cout << "Line " << lnNum << " reads: FilterWidth = " << FilterWidth << ", FilterGap = " << FilterGap << ", FilterLength = " << FilterLength << "." << std::endl;
-				Filter = true;
+				iss >> filterWidth >> filterGap >> filterLength;
+				std::cout << "Line " << lnNum << " reads: filterWidth = " << filterWidth << ", filterGap = " << filterGap << ", filterLength = " << filterLength << "." << std::endl;
+				if(filterWidth < 0 || filterGap < 0 || filterLength < 0)
+					filter = false;
+				else
+					filter = true;
 				break;
 			}
 			case 8:
 			{
 				iss >> trialID;
-				std::cout << "Line " << lnNum << " reads: TrialID = " << trialID << "." << std::endl;
+				std::cout << "Line " << lnNum << " reads: trialID = " << trialID << "." << std::endl;
 				break;
 			}
 			case 9:
 			{
-				iss >> Filter2Width >> Filter2Gap >> Filter2Length;
-				std::cout << "Line " << lnNum << " reads: Filter2Width = " << Filter2Width << ", Filter2Gap = " << Filter2Gap << ", Filter2Length = " << Filter2Length << "." << std::endl;
-				Filter2 = true;
+				iss >> filter2Width >> filter2Gap >> filter2Length;
+				std::cout << "Line " << lnNum << " reads: filter2Width = " << filter2Width << ", filter2Gap = " << filter2Gap << ", filter2Length = " << filter2Length << "." << std::endl;
+				filter2 = true;
 				break;
 			}
 
@@ -92,7 +95,7 @@ parameterReader::parameterReader()
 
 int parameterReader::getMaxTime()
 {
-	return MaxTime;
+	return maxTime;
 }
 
 bool parameterReader::getSticking()
@@ -119,23 +122,27 @@ bool parameterReader::getMerging()
 		return false;
 }
 
-int parameterReader::getxMax()
+int parameterReader::getXSites()
 {
-	return xMax;
+	return xSites;
 }
 
-int parameterReader::getyMax()
+int parameterReader::getYSites()
 {
-	return yMax;
+	return ySites;
 }
 
-int parameterReader::getxSpeed()
+int parameterReader::getXMom()
 {
-	return xSpeed;
+	return xMom;
 }
-int parameterReader::getySpeed()
+int parameterReader::getYMom()
 {
-	return ySpeed;
+	return yMom;
+}
+int parameterReader::getNegYMom()
+{
+	return negYMom;
 }
 int parameterReader::gettotalGrains()
 {
@@ -144,18 +151,18 @@ int parameterReader::gettotalGrains()
 
 int parameterReader::getMaxGrainSize()
 {
-	return MaxGrainSize;
+	return maxGrainSize;
 }
 
 int parameterReader::getMinGrainSize()
 {
-	return MinGrainSize;
+	return minGrainSize;
 }
 
 int parameterReader::getFilterWidth()
 {
-	if (Filter)
-		return FilterWidth;
+	if (filter)
+		return filterWidth;
 	else
 		return -1;
 }
@@ -163,24 +170,24 @@ int parameterReader::getFilterWidth()
 int parameterReader::getFilterGap()
 {
 
-	if (Filter)
-		return FilterGap;
+	if (filter)
+		return filterGap;
 	else
 		return -1;
 }
 int parameterReader::getFilterLength()
 {
 
-	if (Filter)
-		return FilterLength;
+	if (filter)
+		return filterLength;
 	else
 		return -1;
 }
 
 int parameterReader::getFilter2Width()
 {
-	if (Filter2)
-		return Filter2Width;
+	if (filter2)
+		return filter2Width;
 	else
 		return -1;
 }
@@ -188,16 +195,16 @@ int parameterReader::getFilter2Width()
 int parameterReader::getFilter2Gap()
 {
 
-	if (Filter2)
-		return Filter2Gap;
+	if (filter2)
+		return filter2Gap;
 	else
 		return -1;
 }
 int parameterReader::getFilter2Length()
 {
 
-	if (Filter2)
-		return Filter2Length;
+	if (filter2)
+		return filter2Length;
 	else
 		return -1;
 }

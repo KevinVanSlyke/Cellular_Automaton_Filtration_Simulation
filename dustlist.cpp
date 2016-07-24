@@ -128,7 +128,6 @@ dust_list ::operator = (const dust_list  & rhs)
 int dust_list::getTotal()
 {
 	return myTotal;
-
 }
 
 //With conglomeration off this method checks that the new position is empty so that the current dust particle can move into the space.
@@ -202,7 +201,7 @@ void dust_list::moveStep(int ** &updateWorld)
 
 	int myXStep, myYStep, curx, cury, stickx, sticky;
 	int ptclIndx, id;
-	bool xneg, check, stuck, pendingMerge, filter;
+	bool xneg, yneg, check, stuck, pendingMerge, filter;
 	int stuckCount, ptclsHandled, toRemove, hugeCount, beltCount, numStationary, numSplit;
 	int ptclSize, collGrainID;
 
@@ -228,14 +227,14 @@ void dust_list::moveStep(int ** &updateWorld)
 	{
 		if (!myDustList[i].getFilter())
 		{
-			myXStep = (int)((((maxXVel + myDustList[i].getColXVel())* myGenerator->Ran()) - (maxXVel / 2.0)) / (myDustList[i].getSize()));
-			myYStep = (int)(((maxYVel + myDustList[i].getColYVel())* myGenerator->Ran()) / (myDustList[i].getSize()));
+			myXStep = (int)((((2*maxXMom + myDustList[i].getColXMom()) * myGenerator->Ran()) - maxXMom) / myDustList[i].getSize());
+			myYStep = (int)((((maxYMom + negYMom + myDustList[i].getColYMom()) * myGenerator->Ran()) - negYMom)/ myDustList[i].getSize());
 			myDustList[i].setMaxXStep(myXStep);
 			myDustList[i].setMaxYStep(myYStep);
 			myDustList[i].setMoved(false);
 			myDustList[i].setPrevPB(myDustList[i].getCurPB());
-			myDustList[i].setColXVel(0);
-			myDustList[i].setColYVel(0);
+			myDustList[i].setColXMom(0);
+			myDustList[i].setColYMom(0);
 		}
 	}
 
@@ -251,7 +250,7 @@ void dust_list::moveStep(int ** &updateWorld)
 		filter = myDustList[ptclIndx].getFilter();
 
 		//Counts particles too large to move
-		if (ptclSize > maxXVel/2 &&  ptclSize > maxYVel && !filter)
+		if (ptclSize > maxXMom &&  ptclSize > maxYMom && !filter)
 		{
 			hugeCount++;
 			curx = 0;
@@ -287,6 +286,7 @@ void dust_list::moveStep(int ** &updateWorld)
 		
 			//Set a boolean flag for if the x movement is left (-) or right (+)
 			xneg = (myXStep < 0) ? true : false;
+			yneg = (myYStep < 0) ? true : false;
 			curx = 0;
 			cury = 0;
 			stickx = 0;
@@ -306,13 +306,13 @@ void dust_list::moveStep(int ** &updateWorld)
 			{
 				if ((curx == myXStep) && (cury == myYStep))
 					break;
-				if (cury < myYStep)
+				if (std::abs(cury) < std::abs(myYStep))
 				{
-					cury++;
+					yneg ? cury-- : cury++;
 					check = canMakeMove(curx, cury, id);
 					if (!check)
 					{
-						sticky = 1;
+						yneg ? sticky = -1 : sticky = 1;
 						break;
 					}
 				}
@@ -329,12 +329,11 @@ void dust_list::moveStep(int ** &updateWorld)
 			}
 
 			//Once a conflict has been found the x and y movement values are decrimented such that a viable location is held by curx and cury.
-			//This might always just be -1 to each, will need to debug.
 			if (!check)
 			{
 				//If it's stopped by something in the y direction.
 				if (sticky != 0)
-					--cury;
+					yneg ? cury++ : cury--;
 				//If it's stopped by something in the x direction.
 				if (stickx != 0)
 					xneg ? curx++ : curx--;
@@ -396,7 +395,7 @@ void dust_list::moveStep(int ** &updateWorld)
 					}
 					else //If merging is off then we impart momentum upon collision
 					{
- 						calculatePostCollisionVelocities(myDustList[ptclIndx], myDustList[collGrainIndx], curx, cury);		
+ 						calculatePostCollisionMomentum(myDustList[ptclIndx], myDustList[collGrainIndx], curx, cury);		
 					}
 				}
 			}
@@ -475,7 +474,7 @@ void dust_list::moveStep(int ** &updateWorld)
 			if (ptclIndx == -1)
 				std::cout << "Error: 4, splitting" << std::endl;
 			ptclSize = myDustList[i].getSize();
-			if (ptclSize > maxXVel / 2 && ptclSize > maxYVel && !filter)
+			if (ptclSize > maxXMom / 2 && ptclSize > maxYMom && !filter)
 			{
 				//std::cout << "Attempting to split up particle " << id << "." << std::endl;
 				//Tell the world that the space occupied by the grain to be split is empty
@@ -620,25 +619,25 @@ void dust_list::moveStep(int ** &updateWorld)
 
 	//////////////////////////////////////////////////////////
 }
-void dust_list::calculatePostCollisionVelocities(dust_grain movingPtcl, dust_grain staticPtcl, int movActXVel, int movActYVel)
+void dust_list::calculatePostCollisionMomentum(dust_grain movingPtcl, dust_grain staticPtcl, int movActXMom, int movActYMom)
 {
-//	int statXVelBefore = staticPtcl.getPrevXVel();
-//	int statYVelBefore = staticPtcl.getPrevYVel();
-//	int statXMomBefore = staticPtcl.getSize()*statXVelBefore;
-//	int statYMomBefore = staticPtcl.getSize()*statYVelBefore;
-	int movXVelBefore = movingPtcl.getMaxXStep();
-	int movYVelBefore = movingPtcl.getMaxYStep();
-//	int movXMomBefore = movingPtcl.getSize()*movXVelBefore;
-//	int movYMomBefore = movingPtcl.getSize()*movYVelBefore;
+//	int statXMomBefore = staticPtcl.getPrevXMom();
+//	int statYMomBefore = staticPtcl.getPrevYMom();
+//	int statXMomBefore = staticPtcl.getSize()*statXMomBefore;
+//	int statYMomBefore = staticPtcl.getSize()*statYMomBefore;
+	int movXMomBefore = movingPtcl.getMaxXStep();
+	int movYMomBefore = movingPtcl.getMaxYStep();
+//	int movXMomBefore = movingPtcl.getSize()*movXMomBefore;
+//	int movYMomBefore = movingPtcl.getSize()*movYMomBefore;
 //	int netXMom = movXMomBefore + statXMomBefore;
 //	int netYMom = movYMomBefore + statYMomBefore;
-//	int statXMomAfter, statYMomAfter, movXMomAfter, movYMomAfter, statXVelAfter, statYVelAfter, movXVelAfter, movYVelAfter;
+//	int statXMomAfter, statYMomAfter, movXMomAfter, movYMomAfter, statXMomAfter, statYMomAfter, movXMomAfter, movYMomAfter;
 
-	int xImpulse = (movXVelBefore - movActXVel)*movingPtcl.getSize();
-	int yImpulse = (movYVelBefore - movActYVel)*movingPtcl.getSize();
+	int xImpulse = (movXMomBefore - movActXMom)*movingPtcl.getSize();
+	int yImpulse = (movYMomBefore - movActYMom)*movingPtcl.getSize();
 
-	staticPtcl.setColXVel(xImpulse/staticPtcl.getSize());
-	staticPtcl.setColYVel(yImpulse/staticPtcl.getSize());
+	staticPtcl.setColXMom(xImpulse/staticPtcl.getSize());
+	staticPtcl.setColYMom(yImpulse/staticPtcl.getSize());
 	
 	//Check if it hit statPtcl from behind or the side
 }
@@ -1438,8 +1437,8 @@ void dust_list::addGrain(int low, int high)
 	temp.setMaxYLoc(maxYLoc);
 	temp.setMaxXStep(0);
 	temp.setMaxYStep(0);
-	temp.setPrevXVel(0);
-	temp.setPrevYVel(0);
+	temp.setPrevXMom(0);
+	temp.setPrevYMom(0);
 
 	myDustList[myTotal-1] = temp;
 	for (int c = 0; c < Tsize; ++c)
@@ -1655,24 +1654,34 @@ void dust_list::resetPBCounts()
 	}
 }
 
-void dust_list::setMaxXVel(int xvel)
+void dust_list::setMaxXMom(int xMom)
 {
-	maxXVel = xvel;
+	maxXMom = xMom;
 }
 
-void dust_list::setMaxYVel(int yvel)
+void dust_list::setMaxYMom(int yMom)
 {
-	maxYVel = yvel;	
+	maxYMom = yMom;	
 }
 
-int dust_list::getMaxXVel()
+void dust_list::setNegYMom(int nYMom)
 {
-	return maxXVel;
+	negYMom = nYMom;
 }
 
-int dust_list::getMaxYVel()
+int dust_list::getMaxXMom()
 {
-	return maxYVel;
+	return maxXMom;
+}
+
+int dust_list::getMaxYMom()
+{
+	return maxYMom;
+}
+
+int dust_list::getNegYMom()
+{
+	return negYMom;
 }
 
 void dust_list::resetPotentialBlock()

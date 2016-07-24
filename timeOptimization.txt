@@ -1,0 +1,8 @@
+Total runtime is: 24.0032 seconds.
+For 1000time steps.
+Simulation of 1000 particles in an area of:
+1000 by 1000. (x by y)
+Total runtime is: 23.3897 seconds.
+For 1000time steps.
+Simulation of 1000 particles in an area of:
+1000 by 1000. (x by y)
