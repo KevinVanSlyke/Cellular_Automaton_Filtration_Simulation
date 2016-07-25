@@ -250,7 +250,18 @@ void dust_list::moveStep(int ** &updateWorld)
 		filter = myDustList[ptclIndx].getFilter();
 
 		//Counts particles too large to move
-		if (ptclSize > maxXMom &&  ptclSize > maxYMom && !filter)
+		//FIX: Getting division by zero, need to check why the merged particle is showing size 0
+		//If the current particle was already flagged as stuck it will stay stuck, don't bother checking it's movement. Eventually add release probability
+		//Need to add momentum conservation since one particle doesnt move on collision, it should carry through to next timestep
+		if(pendingMerge || filter || stuck) 
+		{
+			curx = 0;
+			cury = 0;
+			if(stuck)
+				stuckCount++;
+			continue;
+		}
+		else if (maxXMom/ptclSize < 1 && maxYMom/ptclSize < 1 && !filter)
 		{
 			hugeCount++;
 			curx = 0;
@@ -258,25 +269,7 @@ void dust_list::moveStep(int ** &updateWorld)
 			continue;
 			//std::cout << "Particle " << id << " is too large." << std::endl;
 		}
-		//If the current particle was already flagged as stuck it will stay stuck, don't bother checking it's movement. Eventually add release probability
-		else if (filter)
-		{
-			curx = 0;
-			cury = 0;
-			continue;
-		}
-		else if (stuck)
-		{
-			stuckCount++;
-			curx = 0;
-			cury = 0;
-		}
-		else if (pendingMerge) //Need to add momentum conservation since one particle doesnt move on collision, it should carry through to next timestep
-		{
-			curx = 0;
-			cury = 0;
-		}
-		else if (!stuck && !pendingMerge && !filter)
+		else
 		{
 			//Randomly generates the 'max' movement range for the given particle in the current time step for both x and y coordinates.
 			//X being horizontal currently allows for dust to drift left or right, so the maximum horizontal movement is really half of the input 'xSpeed'
@@ -291,17 +284,9 @@ void dust_list::moveStep(int ** &updateWorld)
 			cury = 0;
 			stickx = 0;
 			sticky = 0;
-			//Checks if the location that myXStep and myYStep would move the particle into is occupied,
-			//if not it finds the furthest movement possible along that vector.
+			//Slides the particle one lattice site at a time in the direction of its velocity. Stops upon impact with another particle/filter.
 
-			//Debug line
-			//std::cout << "Checking if ptcl " << id << " can move with vel vector " << curx << "," << cury << "." << std::endl;
-
-			check = canMakeMove(curx, cury, id);
-			/*if(!check)
-				std::cout << "Initial move check for " << id << " failed." << std::endl;
-			else
-				std::cout << "Initial move check for " << id << " succeeded." << std::endl;			*/
+			check = true; //Initially true since the first check is the exact space occupied by itself.
 			while (check)
 			{
 				if ((curx == myXStep) && (cury == myYStep))
@@ -340,16 +325,20 @@ void dust_list::moveStep(int ** &updateWorld)
 			}
 			if(curx != 0 || cury != 0)
 			{
-				//After the final destination is chosen we go through all of the particles originally occupied pixels (since it's 2D) and remove them
+				//After the final destination is chosen we go through all of the particles originally occupied lattice sites (since it's 2D) and remove them
 				for (int i = 0; i < ptclSize; ++i)
+				{
 					refWorld[myDustList[ptclIndx].getYatc(i)][myDustList[ptclIndx].getXatc(i)] = -1;
+				}
 
 				//Move the core of the particle in question
 				myDustList[ptclIndx].moveStep(curx, cury); // moveStep(int x, int y) is defined at dustgrain.cpp
 
 				//Re-extend that particle in space
 				for (int j = 0; j < ptclSize; ++j)
+				{
 					refWorld[myDustList[ptclIndx].getYatc(j)][myDustList[ptclIndx].getXatc(j)] = id;
+				}
 			}
 			if (stickx != 0 || sticky != 0)
 			{
@@ -395,6 +384,7 @@ void dust_list::moveStep(int ** &updateWorld)
 					}
 					else //If merging is off then we impart momentum upon collision
 					{
+						//TODO: Make this momentum conservation function also handle merging grains and split grains!
  						calculatePostCollisionMomentum(myDustList[ptclIndx], myDustList[collGrainIndx], curx, cury);		
 					}
 				}
@@ -464,6 +454,7 @@ void dust_list::moveStep(int ** &updateWorld)
 
 
 	//Comment out the nest two for statements below to turn off large dust grain splitting
+	//TODO: Current known bug is that particles disapear after splitting...
 	if (enableSplitting)
 	{
 		for (int i = 0; i < myTotal; i++)
@@ -474,7 +465,9 @@ void dust_list::moveStep(int ** &updateWorld)
 			if (ptclIndx == -1)
 				std::cout << "Error: 4, splitting" << std::endl;
 			ptclSize = myDustList[i].getSize();
-			if (ptclSize > maxXMom / 2 && ptclSize > maxYMom && !filter)
+			int xPosibleDrift = maxXMom/ptclSize;
+			int yPosibleDrift = maxYMom/ptclSize;
+			if (xPosibleDrift < 1 && yPosibleDrift < 1 && !filter)
 			{
 				//std::cout << "Attempting to split up particle " << id << "." << std::endl;
 				//Tell the world that the space occupied by the grain to be split is empty

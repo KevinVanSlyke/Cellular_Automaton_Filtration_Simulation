@@ -21,6 +21,6 @@ echo "Launching dust filtration simulation(s)..."
 for ((id=0; id<1; id=id+1))
 do
 	echo "Running ./visual_dust_simulation "$X" "$Y" "$Px" "$Py" "$nPy" "$num" "$min" "$max" "$t" "$stick" "$splt" "$mrg" "$spacing" "$gap" "$depth" "$id
-	./visual_dust_simulation $X $Y $Px $Py %nPy $num $min $max $t $stick $splt $mrg $spacing $gap $depth $id
+	./visual_dust_simulation $X $Y $Px $Py $nPy $num $min $max $t $stick $splt $mrg $spacing $gap $depth $id
 done
 echo "All Done!"

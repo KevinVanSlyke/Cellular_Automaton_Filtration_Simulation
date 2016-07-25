@@ -61,9 +61,15 @@ int main(int argc, char *argv[])
 	Filter Parameters: Length, Width of Slits, Width of Gaps
 	trialID
 	*/
+	std::cout << argc << "\n ";
+	for(int i =0; i < argc; i++)
+	{
+		std::cout << argv[i];
+	}
+	std::cout << endl;
 	int filter, xSites, ySites, xMom, yMom, negYMom, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, filterLength, filter2Width, filter2Gap, filter2Length;
 	bool enableSticking, enableSplitting, enableMerging;
-	if (argc != 14 || argc != 17 || argc != 20)
+	if (argc != 14 && argc != 17 && argc != 20)
 	{
 		std::cout << "Not enough parameters passed to main (Need 13, 16 or 19 integers after the executable name), trying to read from parameters.txt... " << std::endl;
 		parameterReader *pR = new parameterReader();
