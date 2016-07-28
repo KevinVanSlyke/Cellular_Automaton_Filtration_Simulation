@@ -242,6 +242,7 @@ int main(int argc, char *argv[])
 	Filter Parameters: Length, Width of Slits, Width of Gaps
 	trialID
 	*/
+	
 	int filter, xSites, ySites, xMom, yMom, negYMom, totalGrains, minGrainSize, maxGrainSize, maxTime, sticking, splitting, merging, filterWidth, filterGap, filterLength, filter2Width, filter2Gap, filter2Length;
 	bool enableSticking, enableSplitting, enableMerging;
 	if (argc != 14 || argc != 17 || argc != 20)

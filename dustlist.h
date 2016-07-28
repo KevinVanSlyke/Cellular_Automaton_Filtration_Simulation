@@ -103,6 +103,7 @@ private:
 	//dust_grain mergeGrain_to_filter(int g1, int g2);
 	void mergeGrain_g2_to_g1(int g1Indx, int g2Indx);
 	dust_grain attemptBreakUp(int grain);
+	void separateSplitGrains(dust_grain g2);
 
 	std::vector<int> createRandomOrder();
 

@@ -479,6 +479,7 @@ void dust_list::moveStep(int ** &updateWorld)
 				}
 				//Shrink existing grain and save new grain to be added later
 				newlySplitGrain = attemptBreakUp(ptclIndx);
+				separateSplitGrains(newlySplitGrain);
 				//Tell the world which cells the original particle still occupies
 				ptclSize = myDustList[ptclIndx].getSize();
 				for (int c = 0; c < ptclSize; c++)
@@ -612,6 +613,68 @@ void dust_list::moveStep(int ** &updateWorld)
 
 	//////////////////////////////////////////////////////////
 }
+
+void dust_list::separateSplitGrains(dust_grain g2)
+{
+	int ptclSize = g2.getSize();
+	int ptclID = g2.getID();
+	int myMaxXMom = maxXMom/ptclSize;
+	int myMaxYMom = maxYMom/ptclSize;
+	int myNegMaxYMom = negYMom/ptclSize;
+
+	std::vector < std::vector < int > > available;
+	std::vector < int > try_vec;
+	for (int i=0; i<ptclSize; i++)
+	{
+		if(!canMakeMove(0, myMaxYMom, ptclID))
+		{
+			try_vec.push_back(0); 
+			try_vec.push_back(myMaxYMom);
+			available.push_back(try_vec);
+		}
+		if(!canMakeMove(0, myNegMaxYMom, ptclID))
+		{
+			try_vec.push_back(0); 
+			try_vec.push_back(myNegMaxYMom);
+			available.push_back(try_vec);
+		}
+		if(!canMakeMove(myMaxXMom, 0, ptclID))
+		{
+			try_vec.push_back(myMaxXMom); 
+			try_vec.push_back(0);
+			available.push_back(try_vec);
+		}
+		if(!canMakeMove(-myMaxXMom, 0, ptclID))
+		{
+			try_vec.push_back(-myMaxXMom); 
+			try_vec.push_back(0);
+			available.push_back(try_vec);
+		}
+	}
+
+	if(available.size() > 0)
+	{
+		int try_direction_index = (int) available.size() * myGenerator->Ran();
+		int try_x = available[try_direction_index][0];
+		int try_y = available[try_direction_index][1];
+		//After the final destination is chosen we go through all of the particles originally occupied lattice sites (since it's 2D) and remove them
+		for (int i = 0; i < ptclSize; ++i)
+		{
+			refWorld[g2.getYatc(i)][g2.getXatc(i)] = -1;
+		}
+
+		//Move the core of the particle in question
+		g2.moveStep(try_x, try_y); // moveStep(int x, int y) is defined at dustgrain.cpp
+
+		//Re-extend that particle in space
+		for (int j = 0; j < ptclSize; ++j)
+		{
+			refWorld[g2.getYatc(j)][g2.getXatc(j)] = ptclID;
+		}
+	}
+	g2.setMoved(true);
+}
+
 void dust_list::calculatePostCollisionMomentum(dust_grain movingPtcl, dust_grain staticPtcl, int movActXMom, int movActYMom)
 {
 //	int statXMomBefore = staticPtcl.getPrevXMom();
@@ -887,7 +950,11 @@ dust_grain dust_list::attemptBreakUp(int grain)
 	shard.setPrevPB(dCopy.getPrevPB());
 	shard.setCurPB(dCopy.getCurPB());
 	shard.setFilter(false);
-
+	shard.setMaxXLoc(maxXLoc);
+	shard.setMaxYLoc(maxYLoc);
+	//calculateWidth also sets the internal width of the particle, so the returned value need not be handled.
+	int shard_width = shard.calculateWidth();
+	//TODO: Make sure that the width dist is also updated
 	update_dstr_split(mySize, dCopy.getSize(), shard.getSize());
 
 	return shard;
