@@ -486,7 +486,7 @@ void dust_list::moveStep(int ** &updateWorld)
 			if (ptclIndx == -1)
 				std::cout << "Error: 4, splitting" << std::endl;
 			ptclSize = myDustList[i].getSize();
-			if (ptclSize >= maxXMom && ptclSize >= maxYMom)
+			if (ptclSize >= maxXMom && ptclSize >= maxYMom && !filter)
 			{
 			//	int xPosibleDrift = maxXMom/ptclSize;
 			//	int yPosibleDrift = maxYMom/ptclSize;
