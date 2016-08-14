@@ -52,8 +52,9 @@ public:
 	int getMaxXMom();
 	int getMaxYMom();
 	int getNegYMom();
+
 	void setPillBoxes(int loc, std::vector< int > pBoxes);
-	void setpBCounts(int loc, int pCounts);
+	void setPBCounts(int loc, int pCounts);
 	void setPoreJamTimer(int loc, int jamTimer);
 	void setPoreBlocked(int loc, bool verBlock);
 	void setPotentialBlock(int loc, bool potBlock);
@@ -70,7 +71,7 @@ public:
 	void incrimentTimeStep();
 	
 	// modifiers 
-	void moveStep(int ** &updateWorld);
+	void moveStep(int** &updateWorld);
 
 	void addGrain(int low, int high);
 	void addGrain(int filterGap, int filterWidth, int filterLength);
@@ -82,6 +83,7 @@ public:
 	int getIDByVecLoc(int n);
 	int newUniqueID();			//Returns an int then incriments uniqueID
 	int getVecLocByID(int id);
+
 	void dust_dstr();
 	void setNewTotal();
 
@@ -90,18 +92,22 @@ public:
 	void setProcOutputFolder(std::string dirName);
 
 private:
-	void removeMergedGrain();
-	void ShrinkListbyOne();
-	void IncreaseListbyOne();
+	void removeMergedGrains();
+	void shrinkListbyOne();
+	void increaseListbyOne();
 
 	bool isOpen(int x, int y);
 	bool isOpen(int x, int y, int ignore_grain_j);
 	bool isOpenSelf(std::vector<int> x, std::vector<int> y, int ranSite, int ranCardinal, int psz);
 	
 	bool canMakeMove(int xmove, int ymove, int grainNumber);
+	bool canMakeMove(int xmove, int ymove, dust_grain cgrain);
+
 	int getCollidingGrain(int xmove, int ymove, int grain_self);
 	//dust_grain mergeGrain_to_filter(int g1, int g2);
-	void mergeGrain_g2_to_g1(int g1Indx, int g2Indx);
+	dust_grain mergeGrains(std::vector<dust_grain> grainMergeSet);
+
+
 	dust_grain attemptBreakUp(int grain);
 	void separateSplitGrains(dust_grain g2);
 
@@ -111,10 +117,10 @@ private:
 	void calcPillBoxes(int filterGap, int filterWidth, int filterLength, int start);
 	void checkBlocked();
 	std::vector < bool > checkPoreFilled();
-	void pushBackpBVectors(std::vector < int > corners);
+	void pushBackPillBoxVectors(std::vector < int > corners);
 
 	//Older counting method, still used to track all particles
-	void update_dstr_merge(int old1, int old2, int n);
+	void update_dstr_merge(std::vector<int> oldSizes, int n);
 	void update_dstr_split(int old, int new1, int new2);
 	void update_dstr_stuck(int remove);
 	//For tracking moving particles area/size
@@ -138,23 +144,42 @@ private:
 	bool enableSticking;
 	bool enableMerging;
 	bool enableSplitting;
-	random_gen * myGenerator;
+	random_gen* myGenerator;
+
 	std::vector < dust_grain > myDustList;
+	std::vector < dust_grain > grainsToAdd;
+	std::vector < std::vector < dust_grain > > grainsToMerge;
+
+	void addGrainsToMergeList(dust_grain g1, dust_grain g2);
+
+	//begin new stuff to fix splitting and merging
+/*	int pendingTotal;
+	std::vector < dust_grain > pendingDustList;
+	void syncPendingDustList();
+	void updateMyDustList();
+
+	int** pendingWorld;
+	void syncPendingWorld();
+	void updateRefWorld();
+
+	//end new stuff
+*/
 	int** refWorld;
+
+	int uniqueID;
+
 	std::vector< std::vector< int > > pillBoxes;
 	std::vector< int > pBCounts;
 	std::vector< int > poreJamTimer;
 	std::vector< bool > poreBlocked;
 	std::vector< bool > potentialBlock;
-	dust_grain newlySplitGrain;
-	std::vector < dust_grain > grainsToAdd;
-	int uniqueID;
-
-	std::string procOutputFolder;
 
 	std::vector < std::vector < int > > dustDist;
 	std::vector < std::vector < int > > sizeDist;
 	std::vector < std::vector < int > > dustWidth;
+
+	std::string procOutputFolder;
+
 };
 #define DUST_LIST_H 
 #endif 

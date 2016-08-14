@@ -138,6 +138,14 @@ void world::setWorld(int x, int y, int id)
 	myWorld[y][x] = id;
 }
 
+void world::setWorld(std::vector <int> X, std::vector <int> Y, int id)
+{
+	for (unsigned int c = 0; c < X.size(); c++)
+	{
+		myWorld[Y[c]][X[c]] = id;
+	}
+}
+
 int world::grainNumAt(int x, int y)
 {
 	if ( x < myXSites && y < myYSites)
@@ -250,7 +258,7 @@ void world::updateWorld()
 	{
 		temp = myList->getGrainByVecLoc(n);
 		for (int d = 0; d < temp.getSize(); ++d)
-			myWorld[temp.getYatc(d)][temp.getXatc(d)] = temp.getID();
+			setWorld(temp.getXatc(d), temp.getYatc(d), temp.getID());
 	}
 }
 
@@ -334,7 +342,7 @@ int ** world::getWorldArray()
 	return myWorld;
 }
 
-int world::getCurDust()
+int world::getCurNumDust()
 {
 	return myList->getTotal();
 }

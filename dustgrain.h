@@ -40,6 +40,7 @@ public:
 	// Accessors
 	bool checkMoved();
 	bool checkMerge();
+	bool checkSplit();
 	bool getFilter();
 	bool getStuck();
 	bool spotTaken(int x, int y);
@@ -69,6 +70,7 @@ public:
 	void setFilter(bool filt);
 	void setMoved(bool moved);
 	void setMerge(bool merge);
+	void setSplit(bool split);
 	void setMaxXLoc(int xLen);
 	void setMaxYLoc(int yLen);
 	void setMaxXStep(int mXStep);
@@ -88,6 +90,7 @@ public:
 private:
 	bool stuck;
 	bool pendingMerge;
+	bool pendingSplit;
 	bool hasMoved;
 	bool filter;
 	

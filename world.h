@@ -37,13 +37,14 @@ public:
 	// accessors 
 	int getMaxXSize();
 	int getMaxYSize();
-	int getCurDust();
+	int getCurNumDust();
 
 	int grainNumAt(int x, int y);
 
   // modifiers 
 	void updateWorld();  // Update the matrix of the world according to the locations stored in the dust list
 	void setWorld(int x, int y, int id);
+	void setWorld(std::vector <int> X, std::vector <int> Y, int id);
 
 	void populateWorld(int numDust, int low, int high);
 	void populateWorld(int numDust, int low, int high, int filterGap, int filterWidth, int filterLength);
@@ -53,7 +54,7 @@ public:
 
 	void writingDust(); //tracking dust particles
 	void overlapingDust();
-	int ** getWorldArray();
+	int** getWorldArray();
 	dust_list * myList; // from below 
 
 	void setProcOutputFolder(std::string dirName);
@@ -63,7 +64,7 @@ private:
 	int myXMom, myYMom;
 	int myXSites, myYSites;                            //World Size 
 	int myNegYMom;
-	int ** myWorld;
+	int** myWorld;
 
 	std::string procOutputFolder;
 };

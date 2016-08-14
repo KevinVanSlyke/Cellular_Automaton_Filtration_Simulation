@@ -257,6 +257,16 @@ bool dust_grain::checkMerge()
 	return pendingMerge;
 }
 
+bool dust_grain::checkSplit()
+{
+	return pendingSplit;
+}
+
+void dust_grain::setSplit(bool split)
+{
+	pendingSplit = split;
+}
+
 void dust_grain::setMoved(bool moved)
 {
 	hasMoved = moved;
