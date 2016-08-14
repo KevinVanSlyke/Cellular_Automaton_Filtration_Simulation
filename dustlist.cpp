@@ -207,19 +207,15 @@ void dust_list::moveStep(int ** &updateWorld)
 
 	int myXStep, myYStep, curx, cury, stickx, sticky;
 	int ptclIndx, id;
-	bool xneg, yneg, check, stuck, pendingMerge,  pendingSplit, filter;
+	bool xneg, yneg, check, stuck, pendingMerge, pendingSplit, filter, hasMoved;
 	int stuckCount, ptclsHandled, toRemove, hugeCount, beltCount, numStationary, numSplit = 0;
 	int ptclSize, collGrainID;
 
 	std::vector<int> rem_dust(0);  // define a vector "remnant moving dust" in the chamber
 	resetPBCounts();
 	resetPotentialBlock();
-	
-//	syncPendingDustList();
-//	syncPendingWorld();
 
-	grainsToAdd.clear();
-	grainsToMerge.clear();
+
 	clear_width_dstr();
 	clear_size_dstr();
 
@@ -236,6 +232,8 @@ void dust_list::moveStep(int ** &updateWorld)
 			myDustList[i].setMaxXStep(myXStep);
 			myDustList[i].setMaxYStep(myYStep);
 			myDustList[i].setMoved(false);
+			myDustList[i].setMerge(false);
+			myDustList[i].setSplit(false);
 			myDustList[i].setPrevPB(myDustList[i].getCurPB());
 			myDustList[i].setColXMom(0);
 			myDustList[i].setColYMom(0);
@@ -251,7 +249,7 @@ void dust_list::moveStep(int ** &updateWorld)
 		stuck = myDustList[ptclIndx].getStuck();
 		pendingMerge = myDustList[ptclIndx].checkMerge();
 		ptclSize = myDustList[ptclIndx].getSize();
-
+		hasMoved = myDustList[ptclIndx].checkMoved();
 		pendingSplit = myDustList[ptclIndx].checkSplit();
 		filter = myDustList[ptclIndx].getFilter();
 
@@ -259,7 +257,7 @@ void dust_list::moveStep(int ** &updateWorld)
 		//FIX: Getting division by zero, need to check why the merged particle is showing size 0
 		//If the current particle was already flagged as stuck it will stay stuck, don't bother checking it's movement. Eventually add release probability
 		//Need to add momentum conservation since one particle doesnt move on collision, it should carry through to next timestep
-		if(pendingMerge || filter || stuck || pendingSplit) 
+		if(pendingMerge || filter || stuck || pendingSplit || hasMoved) 
 		{
 			curx = 0;
 			cury = 0;
@@ -348,7 +346,7 @@ void dust_list::moveStep(int ** &updateWorld)
 			}
 			if (stickx != 0 || sticky != 0)
 			{
-				collGrainID = getCollidingGrain(stickx, sticky, ptclIndx);
+				collGrainID = getCollidingGrain(stickx, sticky, id);
 				if (collGrainID == -1)
 				{
 					std::cout << "An error occured: phantom grain collision." << std::endl;
@@ -360,7 +358,7 @@ void dust_list::moveStep(int ** &updateWorld)
 				else
 				{
 					int collGrainIndx = getVecLocByID(collGrainID);
-					if (ptclIndx == -1)
+					if (collGrainIndx == -1)
 						std::cout << "Error: 2, merging" << std::endl;
 					//std::cout << "Particle id " << id << " and " << collGrainID << " have collided at..." << std::endl;
 					if (myDustList[collGrainIndx].getFilter() && enableSticking) //If colliding with filter and sticking is on, stick to it
@@ -376,6 +374,7 @@ void dust_list::moveStep(int ** &updateWorld)
 						myDustList[ptclIndx].setMerge(true);
 						myDustList[ptclIndx].setMoved(true);
 						myDustList[collGrainIndx].setMerge(true);
+						myDustList[collGrainIndx].setMoved(true);
 						addGrainsToMergeList(myDustList[ptclIndx], myDustList[collGrainIndx]);
 					}
 					else //If merging is off then we impart momentum upon collision
@@ -453,11 +452,12 @@ void dust_list::moveStep(int ** &updateWorld)
 			mergeSet = grainsToMerge[i];
 			for (unsigned int j = 0; j < mergeSet.size(); j++)
 			{
-				orig_sizes.push_back(mergeSet[j].getSize());
-				for (int c = 0; c < new_size; c++)
+				int orig_size = mergeSet[j].getSize();
+				orig_sizes.push_back(orig_size);
+				for (int c = 0; c < orig_size; c++)
 				{
-					eraseX = myDustList[ptclIndx].getXatc(c);
-					eraseY = myDustList[ptclIndx].getYatc(c);
+					eraseX = mergeSet[j].getXatc(c);
+					eraseY = mergeSet[j].getYatc(c);
 					refWorld[eraseY][eraseX] = -1;
 				}
 				toRemove++;
@@ -465,11 +465,11 @@ void dust_list::moveStep(int ** &updateWorld)
 			newMergedGrain = mergeGrains(mergeSet);
 			new_size = newMergedGrain.getSize();
 			update_dstr_merge(orig_sizes, new_size);
+			orig_sizes.clear();
 			grainsToAdd.push_back(newMergedGrain);
 		}
-		removeMergedGrains();
+		grainsToMerge.clear();
 	}
-
 
 	//Comment out the nest two for statements below to turn off large dust grain splitting
 	//TODO: Current known bug is that particles disapear after splitting...
@@ -490,6 +490,7 @@ void dust_list::moveStep(int ** &updateWorld)
 				int yPosibleDrift = maxYMom/ptclSize;
 				if (xPosibleDrift < 1 && yPosibleDrift < 1 && !filter ) //&& !stuck)
 				{
+					myDustList[i].setSplit(true);
 					//std::cout << "Attempting to split up particle " << id << "." << std::endl;
 					//Tell the world that the space occupied by the grain to be split is empty
 					for (int c = 0; c < ptclSize; c++)
@@ -498,39 +499,21 @@ void dust_list::moveStep(int ** &updateWorld)
 						int replaceY = myDustList[ptclIndx].getYatc(c);
 						refWorld[replaceY][replaceX] = -1;
 					}
-
 					//Shrink existing grain and save new grain to be added later
-					dust_grain newlySplitGrain = attemptBreakUp(ptclIndx);
-
-					//Tell the world which cells the original particle still occupies
-					ptclSize = myDustList[ptclIndx].getSize();
-					for (int c = 0; c < ptclSize; c++)
-					{
-						int replaceX = myDustList[ptclIndx].getXatc(c);
-						int replaceY = myDustList[ptclIndx].getYatc(c);
-						refWorld[replaceY][replaceX] = id;
-					}
-					grainsToAdd.push_back(newlySplitGrain);
+					std::vector<dust_grain> newlySplitGrains = splitGrain(myDustList[i]);
 					numSplit++;
+					toRemove++;
+					//Tell the world which cells the original particle still occupies
+					for(unsigned int i = 0; i < newlySplitGrains.size(); i++)
+					{
+						grainsToAdd.push_back(newlySplitGrains[i]);
+					}
 				}
 			}
 		}
-
-		//FIXME TODO ERROR : Something wrong with grain splitting
-		for (unsigned int i = 0; i < grainsToAdd.size(); i++)
-		{
-			ptclSize = grainsToAdd[i].getSize();
-			id = grainsToAdd[i].getID();
-			for (int c = 0; c < ptclSize; c++)
-			{
-				int replaceX = grainsToAdd[i].getXatc(c);
-				int replaceY = grainsToAdd[i].getYatc(c);
-				refWorld[replaceY][replaceX] = id;
-			}
-			myDustList.push_back(grainsToAdd[i]);
-			setNewTotal();
-		}
-		grainsToAdd.clear();
+		removeMergedSplitGrains();
+		addMergedSplitGrains();
+		
 	}
 
 	//Sets 'previous' pillbox the particle was in equal to the current pillbox it's in, as the current value has not yet been updated in this iteration.
@@ -633,6 +616,25 @@ void dust_list::moveStep(int ** &updateWorld)
 //	fclose(pFileStuck);
 }
 
+void dust_list::addMergedSplitGrains()
+{
+	int ptclSize, id;
+	for (unsigned int i = 0; i < grainsToAdd.size(); i++)
+	{
+		ptclSize = grainsToAdd[i].getSize();
+		id = grainsToAdd[i].getID();
+		for (int c = 0; c < ptclSize; c++)
+		{
+			int replaceX = grainsToAdd[i].getXatc(c);
+			int replaceY = grainsToAdd[i].getYatc(c);
+			refWorld[replaceY][replaceX] = id;
+		}
+		myDustList.push_back(grainsToAdd[i]);
+		setNewTotal();
+	}
+	grainsToAdd.clear();
+}
+
 //Actually merges two dust particles, removing them from the dust_list and adding a new larger particle at the location of the merger.
 //This must be called after the dust to dust impact calculation is performed.
 dust_grain dust_list::mergeGrains(std::vector <dust_grain> grainMergeSet) //KM
@@ -650,8 +652,8 @@ dust_grain dust_list::mergeGrains(std::vector <dust_grain> grainMergeSet) //KM
 		int g_size = grainMergeSet[i].getSize();
 		for (int c = 0; c < g_size; c++)
 		{
-			x[c + tot_size] = grainMergeSet[i].getXatc(c);
-			y[c + tot_size] = grainMergeSet[i].getYatc(c);
+			x.push_back(grainMergeSet[i].getXatc(c));
+			y.push_back(grainMergeSet[i].getYatc(c));
 			//std::cout << x[c] << "\t" << y[c] << std::endl;
 		}
 		tot_size = tot_size + g_size;
@@ -663,50 +665,66 @@ dust_grain dust_list::mergeGrains(std::vector <dust_grain> grainMergeSet) //KM
 	mergedGrain.setStuck(mergeStuck);
 	mergedGrain.setMaxXLoc(maxXLoc);
 	mergedGrain.setMaxYLoc(maxYLoc);
+	mergedGrain.setMoved(true);
+	mergedGrain.setPrevPB(grainMergeSet[0].getPrevPB());
+	mergedGrain.setCurPB(grainMergeSet[0].getCurPB());
+	mergedGrain.setFilter(false);
+	mergedGrain.calculateWidth();
 	return mergedGrain;
 }
 
 void dust_list::addGrainsToMergeList(dust_grain g1, dust_grain g2)
 {
 	std::vector < dust_grain > mergeSet;
+	std::vector < std::vector < dust_grain > > tempGrainsToMerge = grainsToMerge;
 	int g1ID, g2ID, existingID;
+	bool doubleMerge = true;
 	if (grainsToMerge.size() == 0)
 	{
 		mergeSet.push_back(g1);
 		mergeSet.push_back(g2);
-		grainsToMerge.push_back(mergeSet);
-		return;
+		tempGrainsToMerge.push_back(mergeSet);
 	}
-	g1ID = g1.getID();
-	g2ID = g2.getID();
-	for (unsigned int i = 0; i < grainsToMerge.size(); i++)
+	else
 	{
-		mergeSet = grainsToMerge[i];
-		for (unsigned int j = 0; j < mergeSet.size(); j++)
+		g1ID = g1.getID();
+		g2ID = g2.getID();
+		for (unsigned int i = 0; i < grainsToMerge.size(); i++)
 		{
-			existingID = mergeSet[j].getID();
-			if (g1ID == existingID)
+			mergeSet = grainsToMerge[i];
+			for (unsigned int j = 0; j < mergeSet.size(); j++)
 			{
-				mergeSet.push_back(g2);
-				grainsToMerge[i] = mergeSet;
-				return;
+				existingID = mergeSet[j].getID();
+				if (g1ID == existingID)
+				{
+					mergeSet.push_back(g2);
+					tempGrainsToMerge[i] = mergeSet;
+					doubleMerge = false;
+					break;
+				}
+				if (g2ID == existingID)
+				{
+					mergeSet.push_back(g1);
+					tempGrainsToMerge[i] = mergeSet;
+					doubleMerge = false;
+					break;
+				}
 			}
-			if (g2ID == existingID)
-			{
-				mergeSet.push_back(g1);
-				grainsToMerge[i] = mergeSet;
-				return;
-			}
+			if (!doubleMerge)
+				break;
+		}
+		if (doubleMerge)
+		{
+			mergeSet.clear();
+			mergeSet.push_back(g1);
+			mergeSet.push_back(g2);
+			tempGrainsToMerge.push_back(mergeSet);
 		}
 	}
-	mergeSet.clear();
-	mergeSet.push_back(g1);
-	mergeSet.push_back(g2);
-	grainsToMerge.push_back(mergeSet);
-	return;
+	grainsToMerge = tempGrainsToMerge;
 }
 
-void dust_list::separateSplitGrains(dust_grain g2)
+void dust_list::separateSplitGrains(dust_grain g1, dust_grain g2)
 {
 	int ptclSize = g2.getSize();
 	int ptclID = g2.getID();
@@ -798,9 +816,9 @@ void dust_list::setFunctionality(bool splitting, bool sticking, bool merging)
 }
 
 //Can save time and make things more efficient by making the dust's location vectors a tuple, so they can be manipulated simultaneously and reordered.
-dust_grain dust_list::attemptBreakUp(int grain)
+std::vector<dust_grain> dust_list::splitGrain(dust_grain aGrain)
 {
-	dust_grain dCopy = myDustList[grain];
+	dust_grain dCopy = aGrain;
 	int mySize = dCopy.getSize();
 	std::vector < int > firstShardX;
 	std::vector < int > firstShardY;
@@ -1029,54 +1047,59 @@ dust_grain dust_list::attemptBreakUp(int grain)
 		secondShardX[i] = secondShardX[i] % maxXLoc;
 		secondShardY[i] = secondShardY[i] % maxYLoc;
 	}
+	dust_grain firstShard = dust_grain(firstShardX, firstShardY, firstShardX.size(), newUniqueID());
+	firstShard.setStuck(false);
+	firstShard.setMoved(true);
+	firstShard.setPrevPB(dCopy.getPrevPB());
+	firstShard.setCurPB(dCopy.getCurPB());
+	firstShard.setFilter(false);
+	firstShard.setMaxXLoc(maxXLoc);
+	firstShard.setMaxYLoc(maxYLoc);
+	firstShard.calculateWidth();
 
-	dCopy.growGrain(firstShardX, firstShardY);
-	dCopy.setStuck(false);
-	dCopy.setMoved(true);
-	myDustList[grain] = dCopy;
-
-	dust_grain shard = dust_grain(secondShardX, secondShardY, secondShardX.size(), newUniqueID());
-
-	shard.setStuck(false);
-	shard.setMoved(true);
-	shard.setPrevPB(dCopy.getPrevPB());
-	shard.setCurPB(dCopy.getCurPB());
-	shard.setFilter(false);
-	shard.setMaxXLoc(maxXLoc);
-	shard.setMaxYLoc(maxYLoc);
-	//calculateWidth also sets the internal width of the particle, so the returned value need not be handled.
-	shard.calculateWidth();
+	dust_grain secondShard = dust_grain(secondShardX, secondShardY, secondShardX.size(), newUniqueID());
+	secondShard.setStuck(false);
+	secondShard.setMoved(true);
+	secondShard.setPrevPB(dCopy.getPrevPB());
+	secondShard.setCurPB(dCopy.getCurPB());
+	secondShard.setFilter(false);
+	secondShard.setMaxXLoc(maxXLoc);
+	secondShard.setMaxYLoc(maxYLoc);
+	secondShard.calculateWidth();
 	//TODO: Make sure that the width dist is also updated
-	update_dstr_split(mySize, dCopy.getSize(), shard.getSize());
-
-	return shard;
-
+	update_dstr_split(mySize, firstShard.getSize(), secondShard.getSize());
+	std::vector<dust_grain> shardList;
+	shardList.push_back(firstShard);
+	shardList.push_back(secondShard);
+	return shardList;
 }
 void dust_list::incrimentTimeStep()
 {
 	numTimeSteps++;
 }
 
-/*  getCollidingGrain was from original version handed to me at project start. Not yet implimented, but has been tweaked to reflect other major changes to the code base.
+/*  getCollidingGrain was from original version handed to me at project start. Not yet implemented, but has been tweaked to reflect other major changes to the code base.
 	Method to merge two regular dust grains/particles
-	Not yet tested or implimented
+	Not yet tested or implemented
 	Need to allow for collisions in the canMakeMove method	*/
-int dust_list::getCollidingGrain(int xmove, int ymove, int grain_self) //KM
+int dust_list::getCollidingGrain(int xmove, int ymove, int myid) //KM
 {
-	int collgrain, id, j, x, y;
+	int collid, id, size, x, y;
 	dust_grain temp;
-	temp = getGrainByVecLoc(grain_self);
-	j = temp.getSize();
-	for (int c = 0; c < j; c++)
+	temp = getGrainByID(myid);
+	size = temp.getSize();
+	int myVecIndx = getVecLocByID(myid);
+	for (int c = 0; c < size; c++)
 	{
 		x = (temp.getXatc(c) + xmove + maxXLoc) % maxXLoc;
 		y = (temp.getYatc(c) + ymove + maxYLoc) % maxYLoc;
 
 		id = refWorld[y][x];
-		if ((id != -1) && (id != temp.getID()))
+		int colVecLoc = getVecLocByID(id);
+		if ((id != -1) && (id != myid))
 		{
-			collgrain = id;
-			return collgrain;
+			collid = id;
+			return collid;
 		}
 	}
 	return -1;
@@ -1510,14 +1533,20 @@ void dust_list::addGrain(int low, int high)
 	//std::cout << "Grain id " << id << " added to world." << std::endl;
 
 }
-bool mergePerformed(dust_grain aGrain)
-{
-	return aGrain.checkMerge();
-}
+
 //Removes a specificly indexed grain from the list.
-void dust_list::removeMergedGrains()
+void dust_list::removeMergedSplitGrains()
 {
-	myDustList.erase(std::remove_if(myDustList.begin(), myDustList.end(), mergePerformed), myDustList.end());
+	std::vector<dust_grain> newDustList;
+	for(unsigned int i = 0; i < myDustList.size(); i++)
+	{
+		if(!myDustList[i].checkSplit() and !myDustList[i].checkMerge())
+		{
+			newDustList.push_back(myDustList[i]);
+		}
+	}
+	myDustList = newDustList;
+	setNewTotal();
 }
 
 void dust_list::setNewTotal()
@@ -2154,7 +2183,7 @@ void dust_list::addGrainSk(int filterGap, int filterWidth, int filterLength, flo
 	}
 
 
-	//IncreaseListbyOne();  // Here we don't actually change the size of the list, we're just shifting the filter back and forth.
+	//increaseListbyOne();  // Here we don't actually change the size of the list, we're just shifting the filter back and forth.
 
 	dust_grain temp = dust_grain(x, y, cells, id);
 	myDustList[myTotal - 1] = temp;

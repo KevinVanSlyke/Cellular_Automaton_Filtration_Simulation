@@ -89,7 +89,6 @@ dust_grain::dust_grain(std::vector<int> x, std::vector<int> y, int size, int id)
 //Copier.
 dust_grain::dust_grain(const dust_grain  & d)
 {
-
 	mySize = d.mySize;
 	myX = d.myX;
 	myY = d.myY;

@@ -38,3 +38,11 @@ Total runtime is: 7.76885 seconds.
 For 10000time steps.
 Simulation of 300 particles in an area of:
 100 by 100. (x by y)
+Total runtime is: 50.8317 seconds.
+For 10000time steps.
+Simulation of 500 particles in an area of:
+500 by 500. (x by y)
+Total runtime is: 7.72561 seconds.
+For 10000time steps.
+Simulation of 50 particles in an area of:
+100 by 100. (x by y)

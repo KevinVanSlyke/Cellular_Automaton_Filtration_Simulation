@@ -92,7 +92,9 @@ public:
 	void setProcOutputFolder(std::string dirName);
 
 private:
-	void removeMergedGrains();
+	void removeMergedSplitGrains();
+	void addMergedSplitGrains();
+
 	void shrinkListbyOne();
 	void increaseListbyOne();
 
@@ -108,8 +110,8 @@ private:
 	dust_grain mergeGrains(std::vector<dust_grain> grainMergeSet);
 
 
-	dust_grain attemptBreakUp(int grain);
-	void separateSplitGrains(dust_grain g2);
+	std::vector<dust_grain> splitGrain(dust_grain aGrain);
+	void separateSplitGrains(dust_grain g1, dust_grain g2);
 
 	std::vector<int> createRandomOrder();
 

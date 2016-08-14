@@ -4,6 +4,98 @@
 		"selected_items":
 		[
 			[
+				"temp",
+				"tempGrainsToMerge"
+			],
+			[
+				"increase",
+				"increaseListbyOne"
+			],
+			[
+				"remove",
+				"removeMergedSplitGrains"
+			],
+			[
+				"newlySp",
+				"newlySplitGrains"
+			],
+			[
+				"pend",
+				"pendingMerge"
+			],
+			[
+				"grains",
+				"grainsToAdd"
+			],
+			[
+				"ma",
+				"maxXLoc"
+			],
+			[
+				"se",
+				"setMaxXLoc"
+			],
+			[
+				"addGrains",
+				"addGrainsToMergeList"
+			],
+			[
+				"pushbac",
+				"push_back"
+			],
+			[
+				"coll",
+				"collGrainIndx"
+			],
+			[
+				"mergeGrai",
+				"mergeGrainIDs"
+			],
+			[
+				"grainsTo",
+				"grainsToMerge"
+			],
+			[
+				"dust_",
+				"dust_grain"
+			],
+			[
+				"pending",
+				"pendingDustList"
+			],
+			[
+				"ref",
+				"refWorld"
+			],
+			[
+				"xPo",
+				"xPos_Blocked"
+			],
+			[
+				"maxX",
+				"maxXMom"
+			],
+			[
+				"get",
+				"getPrevXMom"
+			],
+			[
+				"calcu",
+				"calculateWidth"
+			],
+			[
+				"setM",
+				"setMaxYLoc"
+			],
+			[
+				"setma",
+				"setMaxXLoc"
+			],
+			[
+				"newly",
+				"newlySplitGrain"
+			],
+			[
 				"neg",
 				"negYMomRatio"
 			],
@@ -38,10 +130,6 @@
 			[
 				"movXV",
 				"movXVelBefore"
-			],
-			[
-				"get",
-				"getXatc"
 			],
 			[
 				"stat",
@@ -87,7 +175,7 @@
 			"file": "parameters.txt",
 			"settings":
 			{
-				"buffer_size": 48,
+				"buffer_size": 41,
 				"line_ending": "Unix"
 			}
 		},
@@ -95,7 +183,7 @@
 			"file": "visualMain.cpp",
 			"settings":
 			{
-				"buffer_size": 13348,
+				"buffer_size": 13350,
 				"line_ending": "Unix"
 			}
 		},
@@ -103,7 +191,7 @@
 			"file": "world.cpp",
 			"settings":
 			{
-				"buffer_size": 7994,
+				"buffer_size": 8152,
 				"line_ending": "Unix"
 			}
 		},
@@ -111,7 +199,7 @@
 			"file": "world.h",
 			"settings":
 			{
-				"buffer_size": 2062,
+				"buffer_size": 2129,
 				"line_ending": "Unix"
 			}
 		},
@@ -119,31 +207,7 @@
 			"file": "dustlist.cpp",
 			"settings":
 			{
-				"buffer_size": 52330,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/usr/include/c++/5/bits/stl_vector.h",
-			"settings":
-			{
-				"buffer_size": 53668,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dustgrain.cpp",
-			"settings":
-			{
-				"buffer_size": 9173,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Dust_Simulation.sublime-project",
-			"settings":
-			{
-				"buffer_size": 272,
+				"buffer_size": 58585,
 				"line_ending": "Unix"
 			}
 		},
@@ -151,15 +215,31 @@
 			"file": "dustlist.h",
 			"settings":
 			{
-				"buffer_size": 4771,
+				"buffer_size": 5311,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "1137-exec-continue\n1138-exec-interrupt --all\n1139-exec-interrupt --all\n",
+			"file": "dustgrain.cpp",
 			"settings":
 			{
-				"buffer_size": 71,
+				"buffer_size": 9295,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dustgrain.h",
+			"settings":
+			{
+				"buffer_size": 2489,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "12235-exec-continue\n",
+			"settings":
+			{
+				"buffer_size": 20,
 				"line_ending": "Unix",
 				"name": "GDB Session",
 				"read_only": true,
@@ -295,23 +375,28 @@
 	],
 	"file_history":
 	[
+		"/build/glibc-GKVZIf/glibc-2.23/sysdeps/unix/sysv/linux/raise.c",
+		"/usr/include/c++/5/bits/vector.tcc",
+		"/usr/include/c++/5/bits/stl_vector.h",
+		"/home/kevin/Projects/Dust_Simulation/Makefile",
+		"/home/kevin/Projects/Dust_Simulation/readme - inputs&outputs.txt",
+		"/home/kevin/Projects/Dust_Simulation/dustgrain.cpp",
+		"/home/kevin/Projects/Dust_Simulation/randomgen.cpp",
+		"/build/glibc-GKVZIf/glibc-2.23/sysdeps/x86_64/multiarch/memcpy-avx-unaligned.S",
+		"/home/kevin/Projects/Dust_Simulation/Dust_Simulation.sublime-project",
+		"/home/kevin/Projects/Dust_Simulation/world.h",
+		"/home/kevin/Projects/Dust_Simulation/dustlist.h",
 		"/home/kevin/Projects/Dust_Simulation/Back-Ups/glutFunctions.txt",
 		"/home/kevin/Projects/Dust_Simulation/main.cpp",
 		"/home/kevin/Projects/Dust_Simulation/parameterReader.h",
 		"/home/kevin/Projects/Dust_Simulation/parameterReader.cpp",
-		"/home/kevin/Projects/Dust_Simulation/dustgrain.cpp",
-		"/home/kevin/Projects/Dust_Simulation/Dust_Simulation.sublime-project",
-		"/home/kevin/Projects/Dust_Simulation/readme - inputs&outputs.txt",
 		"/home/kevin/Projects/Dust_Simulation/dustgrain.h",
 		"/home/kevin/Projects/Dust_Simulation/run_vis_sim.sh",
 		"/home/kevin/Projects/Dust_Simulation/run_sim.sh",
 		"/home/kevin/Projects/Dust_Simulation/parameters.txt",
-		"/home/kevin/Projects/Dust_Simulation/randomgen.cpp",
-		"/home/kevin/Projects/Dust_Simulation/Makefile",
 		"/home/kevin/Projects/Dust_Simulation/Back-Ups/visualMain.cpp.bak",
 		"/usr/include/c++/5/ext/new_allocator.h",
 		"/usr/include/c++/5/bits/allocator.h",
-		"/usr/include/c++/5/bits/stl_vector.h",
 		"/home/kevin/.config/sublime-text-3/Packages/SublimeGDB/SublimeGDB.sublime-settings",
 		"/home/kevin/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
 		"/home/kevin/.config/sublime-text-3/Packages/User/SublimeGDB.sublime-settings",
@@ -336,6 +421,49 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"grainsToMerge",
+			"update_dstr_merge",
+			"oldSizes",
+			"grainsToMerge",
+			"width",
+			"getCollidingGrain",
+			"Error locating dust grain",
+			"shrinkLi",
+			"IncreaseList",
+			"removeMergedSplitGrains",
+			"splitGrain",
+			"mergeGrains",
+			"removeMergedGrains",
+			"remove",
+			"toRemove",
+			"updateWorld",
+			"increaseListbyOne",
+			"pendingWorld",
+			"newlySplitGrain",
+			"myWorld",
+			"refWorld",
+			"refWorldww",
+			"refWorld",
+			"setMaxYStep",
+			"isOpenSelf",
+			"setpB",
+			"ShrinkListbyOne",
+			"removeMergedGrain",
+			"pushback",
+			"mergeGrain_g2_to_g1",
+			"if (enableS",
+			"if (enable",
+			"if(enable",
+			"separateSplitGrains",
+			"getVecLocByID",
+			"separateSplitGrains",
+			"display",
+			"takeStep",
+			"glutIdleFunc",
+			"windowWidth",
+			"update_size_dstr",
+			"update_width_dstr",
+			"dustWidth",
 			"or",
 			"filter",
 			"takestep",
@@ -413,6 +541,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"refWorld",
 			"filterLength",
 			"negYMom",
 			"m",
@@ -445,7 +574,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -454,26 +583,27 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 48,
+						"buffer_size": 41,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								15,
-								15
+								33,
+								33
 							]
 						],
 						"settings":
 						{
+							"spell_check": false,
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
@@ -482,15 +612,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 13348,
+						"buffer_size": 13350,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1433,
-								1433
+								1876,
+								1876
 							]
 						],
 						"settings":
@@ -500,10 +630,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 733.0,
+						"translation.y": 779.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 13,
 					"type": "text"
 				},
 				{
@@ -512,15 +642,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7994,
+						"buffer_size": 8152,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5395,
-								5395
+								5613,
+								5613
 							]
 						],
 						"settings":
@@ -529,10 +659,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3129.0,
+						"translation.y": 3418.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
@@ -541,15 +671,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2062,
+						"buffer_size": 2129,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1908,
-								1908
+								1264,
+								1264
 							]
 						],
 						"settings":
@@ -558,10 +688,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 240.0,
+						"translation.y": 315.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 12,
 					"type": "text"
 				},
 				{
@@ -570,15 +700,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 52330,
+						"buffer_size": 58585,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								11933,
-								11933
+								4590,
+								4590
 							]
 						],
 						"settings":
@@ -588,37 +718,36 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 5717.0,
+						"translation.y": 2972.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 5,
-					"file": "/usr/include/c++/5/bits/stl_vector.h",
+					"file": "dustlist.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 53668,
+						"buffer_size": 5311,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								22338,
-								22338
+								4565,
+								4565
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 9444.0,
+						"translation.y": 1776.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 8,
@@ -630,15 +759,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9173,
+						"buffer_size": 9295,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3396,
-								3396
+								1615,
+								1615
 							]
 						],
 						"settings":
@@ -647,55 +776,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2619.0,
+						"translation.y": 1044.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
 					"buffer": 7,
-					"file": "Dust_Simulation.sublime-project",
+					"file": "dustgrain.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 272,
+						"buffer_size": 2489,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								210,
-								210
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "dustlist.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4771,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1302,
-								1302
+								1695,
+								1695
 							]
 						],
 						"settings":
@@ -704,10 +805,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1620.0,
+						"translation.y": 540.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 7,
 					"type": "text"
 				}
 			]
@@ -717,19 +818,19 @@
 			"sheets":
 			[
 				{
-					"buffer": 9,
+					"buffer": 8,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 71,
+						"buffer_size": 20,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								71,
-								71
+								20,
+								20
 							]
 						],
 						"settings":
@@ -744,7 +845,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 9,
 					"semi_transient": false,
 					"settings":
 					{
@@ -771,7 +872,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 11,
+					"buffer": 10,
 					"semi_transient": false,
 					"settings":
 					{
@@ -804,7 +905,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 12,
+					"buffer": 11,
 					"semi_transient": false,
 					"settings":
 					{
@@ -837,7 +938,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 13,
+					"buffer": 12,
 					"semi_transient": false,
 					"settings":
 					{
@@ -864,7 +965,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 13,
 					"semi_transient": false,
 					"settings":
 					{
@@ -948,11 +1049,15 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 84.0
+		"height": 298.0
 	},
 	"output.find_results":
 	{
 		"height": 0.0
+	},
+	"output.unsaved_changes":
+	{
+		"height": 100.0
 	},
 	"pinned_build_system": "",
 	"project": "Dust_Simulation.sublime-project",
@@ -996,7 +1101,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 136.0,
+	"side_bar_width": 247.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
