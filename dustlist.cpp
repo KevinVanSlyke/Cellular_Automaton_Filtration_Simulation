@@ -469,6 +469,8 @@ void dust_list::moveStep(int ** &updateWorld)
 			grainsToAdd.push_back(newMergedGrain);
 		}
 		grainsToMerge.clear();
+		removeMergedSplitGrains();
+		addMergedSplitGrains();
 	}
 
 	//Comment out the nest two for statements below to turn off large dust grain splitting
@@ -484,36 +486,36 @@ void dust_list::moveStep(int ** &updateWorld)
 			if (ptclIndx == -1)
 				std::cout << "Error: 4, splitting" << std::endl;
 			ptclSize = myDustList[i].getSize();
-			if (ptclSize > 0)
+			if (ptclSize >= maxXMom && ptclSize >= maxYMom)
 			{
-				int xPosibleDrift = maxXMom/ptclSize;
-				int yPosibleDrift = maxYMom/ptclSize;
-				if (xPosibleDrift < 1 && yPosibleDrift < 1 && !filter ) //&& !stuck)
+			//	int xPosibleDrift = maxXMom/ptclSize;
+			//	int yPosibleDrift = maxYMom/ptclSize;
+			//	if (xPosibleDrift < 1 && yPosibleDrift < 1 && !filter ) //&& !stuck)
+			//	if(ptclSize >= (maxXMom and maxYMom))
+			//	{
+				myDustList[i].setSplit(true);
+				//std::cout << "Attempting to split up particle " << id << "." << std::endl;
+				//Tell the world that the space occupied by the grain to be split is empty
+				for (int c = 0; c < ptclSize; c++)
 				{
-					myDustList[i].setSplit(true);
-					//std::cout << "Attempting to split up particle " << id << "." << std::endl;
-					//Tell the world that the space occupied by the grain to be split is empty
-					for (int c = 0; c < ptclSize; c++)
-					{
-						int replaceX = myDustList[ptclIndx].getXatc(c);
-						int replaceY = myDustList[ptclIndx].getYatc(c);
-						refWorld[replaceY][replaceX] = -1;
-					}
-					//Shrink existing grain and save new grain to be added later
-					std::vector<dust_grain> newlySplitGrains = splitGrain(myDustList[i]);
-					numSplit++;
-					toRemove++;
-					//Tell the world which cells the original particle still occupies
-					for(unsigned int i = 0; i < newlySplitGrains.size(); i++)
-					{
-						grainsToAdd.push_back(newlySplitGrains[i]);
-					}
+					int replaceX = myDustList[ptclIndx].getXatc(c);
+					int replaceY = myDustList[ptclIndx].getYatc(c);
+					refWorld[replaceY][replaceX] = -1;
 				}
+				//Shrink existing grain and save new grain to be added later
+				std::vector<dust_grain> newlySplitGrains = splitGrain(myDustList[i]);
+				numSplit++;
+				toRemove++;
+				//Tell the world which cells the original particle still occupies
+				for(unsigned int i = 0; i < newlySplitGrains.size(); i++)
+				{
+					grainsToAdd.push_back(newlySplitGrains[i]);
+				}
+			//	}
 			}
 		}
 		removeMergedSplitGrains();
 		addMergedSplitGrains();
-		
 	}
 
 	//Sets 'previous' pillbox the particle was in equal to the current pillbox it's in, as the current value has not yet been updated in this iteration.
@@ -1088,14 +1090,12 @@ int dust_list::getCollidingGrain(int xmove, int ymove, int myid) //KM
 	dust_grain temp;
 	temp = getGrainByID(myid);
 	size = temp.getSize();
-	int myVecIndx = getVecLocByID(myid);
 	for (int c = 0; c < size; c++)
 	{
 		x = (temp.getXatc(c) + xmove + maxXLoc) % maxXLoc;
 		y = (temp.getYatc(c) + ymove + maxYLoc) % maxYLoc;
 
 		id = refWorld[y][x];
-		int colVecLoc = getVecLocByID(id);
 		if ((id != -1) && (id != myid))
 		{
 			collid = id;
