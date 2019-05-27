@@ -3,13 +3,13 @@ i) parameters.txt
 Parameters are read from top to bottom as follows:
 xSites ySites (horizontal/width of simulation area in # of lattice sites) (vertical/height of simulation area)
 xMom yMom yNegMom (max momomentum of particle in the given dimension that can be randomly caused by the fluid, min x mom = -xMom, third option tells reverse y momentum)
-totalGrains 
+totalGrains
 MinGrainSize MaxGrainSize
 maxTimeSteps
 enable: sticking, splitting, merging
 trialID
-FilterWidth FilterGap FilterLength
-Filter2Width Filter2Gap Filter2Length
+poreSeparation poreWidth poreDepth (for filter layer 1)
+pore2Separation pore2Width pore2Depth (for filter layer 2)
 
 Outputs:
 1) dustCount.txt
@@ -29,6 +29,3 @@ At each timestep:
 
 5) poresBlocked.txt
 ID of pore blocked, time of blockage
-
-
-
