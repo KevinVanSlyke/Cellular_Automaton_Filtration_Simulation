@@ -1,5 +1,6 @@
 ./Source_Code contains the .cpp, .h and makefile to compile the agent based particle filtration software.
 ./Executable contains stable executable with and without visualization, along with scripts to run them.
+	Note that every time the makefile is run in ./Source_Code the new exectuables need to be moved to ./Executable
 ./Executable/parameters.txt is read by the executable in the following format to set parameters.
 
 Inputs:
