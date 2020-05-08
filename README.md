@@ -1,6 +1,8 @@
 Directories are duplicate of root files.
 
-Inputs are read top to bottom as follows from parameters.txt:
+Input Files...
+
+1) parameters.txt
 
 xSites ySites (horizontal/width of simulation area in # of lattice sites) (vertical/height of simulation area)
 
@@ -20,7 +22,7 @@ poreSeparation poreWidth poreDepth (for filter layer 1)
 
 pore2Separation pore2Width pore2Depth (for filter layer 2)
 
-Outputs:
+Output Files...
 
 1) dustCount.txt
 
