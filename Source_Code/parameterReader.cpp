@@ -144,22 +144,22 @@ int parameterReader::getNegYMom()
 {
 	return negYMom;
 }
-int parameterReader::gettotalGrains()
+int parameterReader::gettotalGrains() //Credited Adam Sokolow
 {
 	return totalGrains;
 }
 
-int parameterReader::getMaxGrainSize()
+int parameterReader::getMaxGrainSize() //Credited Adam Sokolow
 {
 	return maxGrainSize;
 }
 
-int parameterReader::getMinGrainSize()
+int parameterReader::getMinGrainSize() //Credited Adam Sokolow
 {
 	return minGrainSize;
 }
 
-int parameterReader::getFilterWidth()
+int parameterReader::getFilterWidth() //Credited Adam Sokolow
 {
 	if (filter)
 		return filterWidth;
@@ -167,7 +167,7 @@ int parameterReader::getFilterWidth()
 		return -1;
 }
 
-int parameterReader::getFilterGap()
+int parameterReader::getFilterGap() //Credited Adam Sokolow
 {
 
 	if (filter)
@@ -175,7 +175,7 @@ int parameterReader::getFilterGap()
 	else
 		return -1;
 }
-int parameterReader::getFilterLength()
+int parameterReader::getFilterLength() //Credited Adam Sokolow
 {
 
 	if (filter)

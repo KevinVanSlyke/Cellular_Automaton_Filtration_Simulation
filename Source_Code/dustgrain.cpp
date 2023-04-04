@@ -17,11 +17,11 @@ Dated Jan 2 2016 */
 dust_grain::dust_grain()
 {
 	mySize = -1;
-	myX = std::vector<int>(0);
+	myX = std::vector<int>(0); 
 	myY = std::vector<int>(0);
 	stuck = false;
-	prevPillbox = -1;
-	curPillbox = -1;
+	prevPillbox = -1; //The previous pore the dust grain occupied
+	curPillbox = -1; //The current pore the dust grain occupies
 	pendingMerge = false;
 	hasMoved = false;
 	grainID = -1;
@@ -145,7 +145,7 @@ dust_grain ::operator = (const dust_grain  & rhs)
 	return *this;
 }
 
-int dust_grain::getSize()
+int dust_grain::getSize() //Credited Adam Sokolow
 {
 	return mySize;
 }
@@ -165,8 +165,8 @@ void dust_grain::setStuck(bool stk)
 	stuck = stk;
 }
 
-//Check if pixel is occupied by itself.
-bool dust_grain::spotTaken(int x, int y)
+//Check if pixel is occupied by dust_grain.
+bool dust_grain::spotTaken(int x, int y) //Credited Adam Sokolow
 {
 	for (int c = 0; c < mySize; c++)
 		if (myX[c] == x && myY[c] == y)
@@ -195,7 +195,7 @@ void dust_grain::setColYMom(int cYMom)
 	colYMom = cYMom;
 }
 //Moves the location of a single dust particle.
-void dust_grain::moveStep(int x, int y)
+void dust_grain::moveStep(int x, int y) //Credited Adam Sokolow
 {
 	for (int c = 0; c < mySize; c++)
 	{
@@ -204,7 +204,7 @@ void dust_grain::moveStep(int x, int y)
 	}
 }
 
-int dust_grain::getXatc(int c)
+int dust_grain::getXatc(int c) //Credited Adam Sokolow
 {
 	if (c < mySize)
 		return myX[c];
@@ -212,7 +212,7 @@ int dust_grain::getXatc(int c)
 		return -1;
 }
 
-int dust_grain::getYatc(int c)
+int dust_grain::getYatc(int c) //Credited Adam Sokolow
 {
 
 	if (c < mySize)

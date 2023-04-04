@@ -1,0 +1,31 @@
+GL/glut.h Install/Configuration
+
+Webpage I was following: http://web.eecs.umich.edu/~sugih/courses/eecs487/glut-howto/#win
+
+Steps performed:
+
+header file:
+C:\Program Files (x86)\Microsoft Visual Studio *\VC\include\GL\glut.h 
+
+	moved to
+	
+	C:\Program Files (x86)\Windows Kits\8.1\Include\um\gl\glut.h 
+
+library file:
+C:\Program Files (x86)\Microsoft Visual Studio *\VC\lib\glut32.lib
+
+	moved to
+	
+	C:\Program Files (x86)\Windows Kits\8.1\Lib\glut32.lib
+	also added to the project directory and loaded as a resource in Visual Studio
+
+runtime, dynamically-linked (dll), shared library:
+C:\Program Files (x86)\Microsoft Visual Studio *\VC\bin\glut32.dll
+
+	moved to
+	
+	C:\Program Files (x86)\Windows Kits\8.1\bin\x86\glut32.dll
+	
+	and
+	
+	C:\Users\kevin\Documents\Visual Studio 2013\Projects\Dust Test\Dust Test\glut32.dll

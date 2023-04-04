@@ -131,7 +131,7 @@ dust_list ::operator = (const dust_list  & rhs)
 	return *this;
 }
 
-int dust_list::getTotal()
+int dust_list::getTotal() //Credited Adam Sokolow
 {
 	return myTotal;
 }
@@ -146,7 +146,7 @@ bool dust_list::isOpen(int x, int y, int grain_id)
 }
 
 //Same as above but doesn't check if the new location overlaps with the current one.
-bool dust_list::isOpen(int x, int y)
+bool dust_list::isOpen(int x, int y) //Credited Adam Sokolow
 {
 	if (refWorld[y][x] == -1)
 		return true;
@@ -155,7 +155,7 @@ bool dust_list::isOpen(int x, int y)
 }
 
 //Determines if cardinal neighboring elements are open for the current particle of size psz to be physically extended into
-bool dust_list::isOpenSelf(std::vector<int> x, std::vector<int> y, int ranSite, int ranCardinal, int psz)
+bool dust_list::isOpenSelf(std::vector<int> x, std::vector<int> y, int ranSite, int ranCardinal, int psz) //Credited Adam Sokolow
 {
 	int i, x1, y1;
 	bool check = true;
@@ -1084,7 +1084,7 @@ void dust_list::incrimentTimeStep()
 	Method to merge two regular dust grains/particles
 	Not yet tested or implemented
 	Need to allow for collisions in the canMakeMove method	*/
-int dust_list::getCollidingGrain(int xmove, int ymove, int myid) //KM
+int dust_list::getCollidingGrain(int xmove, int ymove, int myid) //Credited Krishna Mohan
 {
 	int collid, id, size, x, y;
 	dust_grain temp;
@@ -1156,12 +1156,11 @@ bool dust_list::canMakeMove(int xmove, int ymove, int grainID)
 
 	}
 	return canMakeIt;
-	/*Alternative: Check xmove and ymove sepaarately
-	if(!isOpen(( (myDustList[grainNumber].getXatc(c)+maxXLoc)%maxXLoc), ((myDustList[grainNumber].getYatc(c)+ymove+maxYLoc)%maxYLoc),grainNumber))
+	/*Alternative by Adam Sokolow: Check xmove and ymove sepaarately//Credited Adam Sokolow
+	if(!isOpen(( (myDustList[grainNumber].getXatc(c)+maxXLoc)%maxXLoc), ((myDustList[grainNumber].getYatc(c)+ymove+maxYLoc)%maxYLoc),grainNumber)) 
 							return false;
 	if(!isOpen(( (myDustList[grainNumber].getXatc(c)+xmove+maxXLoc)%maxXLoc), ((myDustList[grainNumber].getYatc(c)+maxYLoc)%maxYLoc),grainNumber))
 							return false;	*/
-
 }
 
 bool dust_list::canMakeMove(int xmove, int ymove, dust_grain cgrain)
@@ -1195,7 +1194,7 @@ bool dust_list::canMakeMove(int xmove, int ymove, dust_grain cgrain)
 //Actually merges dust particles to filter, removing them from the dust_list and adding a new larger particle at the location of the merger.
 //Currently not used, there is instead a flag that gets set in moveStep if the center of a particle impacts with the filter.
 //TODO: Impliment dust sticking via this method. It would likely be more efficient but would make it very hard to impliment un-sticking.
-/*dust_grain dust_list::mergeGrain_to_filter(int g1, int g2) //KM
+/*dust_grain dust_list::mergeGrain_to_filter(int g1, int g2) //Credited Krishna Mohan
 {
 	dust_grain temp, g1grain, g2grain;
 	int g1sze, g2sze, totsze, c;
@@ -1230,7 +1229,7 @@ void dust_list::setProcOutputFolder(std::string dirName)
 }
 
 //Creates the first filter based on input parameters and inserts it in the simulation.
-void dust_list::addGrain(int filterGap, int filterWidth, int filterLength)
+void dust_list::addGrain(int filterGap, int filterWidth, int filterLength) //Credited Adam Sokolow
 {
 	std::cout << "Adding Filter..." << std::endl;
 	int Chunk = filterGap + filterWidth;
@@ -1303,7 +1302,7 @@ void dust_list::addGrain(int filterGap, int filterWidth, int filterLength)
 
 //Creates the second filter based on a second set of input parameters and inserts it in the simulation.
 //TODO: Need to just change the code above to have it placed at a new location by the same function, maybe have the y loc determined by current size of refWorld.
-void dust_list::addGrain2(int filter2Gap, int filter2Width, int filter2Length)
+void dust_list::addGrain2(int filter2Gap, int filter2Width, int filter2Length) //Credited Adam Sokolow
 {
 	std::cout << "Adding Filter" << std::endl;
 	int Chunk = filter2Gap + filter2Width;
@@ -1382,7 +1381,7 @@ with
 myGenerator->Gauss()
 Only required in the first line of dust_list::addGrain	*/
 
-double dust_list::Abs(double Nbr)
+double dust_list::Abs(double Nbr) //Credited Adam Sokolow
 {
 	//	return (Nbr >= 0) ? Nbr : -Nbr;
 	if (Nbr >= 0)
@@ -1392,7 +1391,7 @@ double dust_list::Abs(double Nbr)
 }
 
 //Randomly generataes a grain between the min and max grain size input parameters then randomly places it at an empty location in the simulation.
-void dust_list::addGrain(int low, int high)
+void dust_list::addGrain(int low, int high) //Credited Adam Sokolow, comments and revisions made by Kevin Van Slyke 
 {
 	//Comment out to switch between gaussian and normal particle size distributions
 	//int Tsize = ((int)(1000000000*myGenerator->Ran()))%(high-low+1)+low;
@@ -1555,7 +1554,7 @@ void dust_list::setNewTotal()
 }
 
 //Lowers the size of the list by one both in memory and in the int value of the total num ptcls.
-void dust_list::shrinkListbyOne()
+void dust_list::shrinkListbyOne() //Credited Adam Sokolow
 {
 	if (myTotal > 0)
 	{
@@ -1566,14 +1565,14 @@ void dust_list::shrinkListbyOne()
 }
 
 //Increase the size of the list by one and update myTotal.
-void dust_list::increaseListbyOne()
+void dust_list::increaseListbyOne() //Credited Adam Sokolow
 {
 	myTotal++;
 	myDustList.resize(myTotal);
 }
 
 //Randomly selects the order in which dust_grains will perform their random movements.
-std::vector<int> dust_list::createRandomOrder()
+std::vector<int> dust_list::createRandomOrder()  //Credited Adam Sokolow
 {
 	std::vector<int> temp(myTotal);
 	for (int i = 0; i < myTotal; ++i)

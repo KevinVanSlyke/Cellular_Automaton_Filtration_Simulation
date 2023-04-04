@@ -1,9 +1,4 @@
-//  Adam Sokolow
-//  adam.sokolow@duke.edu
-//  Dust simulation for Dr. Sen
-//  Dated July 29 2005
-
-/*	Edited by Kevin VanSlyke
+/*	Created by Kevin VanSlyke
 kgvansly@buffalo.edu
 Dated Jan 2 2016*/
 
@@ -59,26 +54,30 @@ void takeStep();
 void(*Functor)() = myIdle;
 void init();
 void display();
-void reshape(int w, int h);
-void mouse(int button, int state, int x, int y);
-void setView(int Sx, int Sy, int Ex, int Ey);
+// Functions to zoom during simulation runtime were removed
+// void reshape(int w, int h);
+// void mouse(int button, int state, int x, int y);
+// void setView(int Sx, int Sy, int Ex, int Ey);
 void resetView();
 GLubyte * updateWorldImage(int ** worldArray);
 void initWorldImage();
 
-struct Box {    /* pixel coordinates for mouse events */
+// pixel coordinates for mouse events
+struct Box //Credited Adam Sokolow
+{     
 	int left;
 	int right;
 	int top;
 	int bottom;
 } L_border, R_border, T_border, B_border, button_box[3], dustWindow;
 
-int isInside(struct Box *box, int x, int y) {
+int isInside(struct Box *box, int x, int y) //Credited Adam Sokolow
+{
 	return box->left < x && box->right > x
 		&& box->top < y && box->bottom > y;
 }
 
-void myIdle()
+void myIdle() //Credited Adam Sokolow
 {
 	glutPostRedisplay();
 	myWorld->updateWorld();
@@ -116,7 +115,7 @@ void takeStep()
 		glutPostRedisplay();
 }
 
-void init()
+void init() //Credited Adam Sokolow
 {
 	glClearColor(1.0, 195 / 255.0, 0.0, 0.0);
 	glShadeModel(GL_FLAT);
@@ -124,7 +123,7 @@ void init()
 	resetView();
 }
 
-void drawText(const string& str, int x, int y)
+void drawText(const string& str, int x, int y) //Credited Adam Sokolow
 {
 	glRasterPos2i(x, y);
 	int len = str.find('\0');
@@ -157,10 +156,69 @@ void reshape(int w, int h)
 	glViewport((GLint)-windowWidth/2, (GLint)-windowHeight/2, (GLsizei)windowWidth, (GLsizei)windowHeight);
 }
 
-void mouse(int button, int state, int x, int y)
+/* Function not used, no dialog boxes or user input while running
+void mouse(int button, int state, int x, int y) //Credited by Adam Sokolow
 {
-	//
-}
+   switch (button) {
+     case GLUT_LEFT_BUTTON:
+          if (state == GLUT_DOWN) {
+               if (isInside(&T_box, x, y)) 
+			   {
+
+//				   outfilebit();
+ 
+               } else if (isInside(&algorithm_box[0], x, y)) 
+			   {
+                  if (running) {
+                         running = 0;
+                         glutIdleFunc(myidol);
+                    } else {
+                         running = 1;
+                         glutIdleFunc(takestep);
+                    }
+               }else if (isInside(&algorithm_box[1], x, y)) 
+			   {
+					if(zoom)
+					{
+						zoom=false;
+						myWorld->resetView();
+					}
+					else
+						zoom = true;
+
+
+			   }
+
+			   else if (isInside(&spin_box,x,y))
+			   {
+                  selectX1 = x-spin_box.left;
+				  selectY1 = spin_box.top-y;
+               }
+			   else if (isInside(&algorithm_box[2], x, y)) 
+			   {
+				   offvisual ? offvisual = false : offvisual = true;
+			   
+			   }
+          }
+		  if (state == GLUT_UP && isInside(&spin_box,x,y)&&zoom) 
+		  {
+				selectX2 = x-spin_box.left;
+				  selectY2 = spin_box.top-y;
+				  if(selectX1!=selectX2&&selectY1!=selectY2)
+				  {
+					 
+				  myWorld->setView(selectX1,selectY2,selectX2,selectY1);
+				  myWorld->setMagnification(max(min(500/((selectX2-selectX1)),500/((selectY1-selectY2))),1));
+				  }
+						 
+		}
+          glutPostRedisplay();
+          break;
+     default:
+          break;
+    }
+} 
+*/
 
 GLubyte * updateWorldImage(int ** worldArray)   // GLubyte * <declare "getWorldImage()" member> 
 {
@@ -197,6 +255,7 @@ GLubyte * updateWorldImage(int ** worldArray)   // GLubyte * <declare "getWorldI
 
 }
 
+/* Function not used, no dialog boxes or user input while running
 void setView(int Sx, int Sy, int Ex, int Ey)
 {
 	viewStartX = Sx;
@@ -204,7 +263,7 @@ void setView(int Sx, int Sy, int Ex, int Ey)
 	viewEndX = Ex;
 	viewEndY = Ey;
 }
-
+*/
 void resetView()
 {
 	viewStartX = 0;
@@ -457,9 +516,8 @@ int main(int argc, char *argv[])
 
 	init();
 	glutDisplayFunc(display);
-
-	glutReshapeFunc(reshape);
-	glutMouseFunc(mouse);
+	// glutReshapeFunc(reshape);
+	// glutMouseFunc(mouse);
 	glutIdleFunc(takeStep);
 	glutMainLoop();
 }

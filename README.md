@@ -1,8 +1,14 @@
 Directories are duplicate of root files.
 
+Original code by Adam Sokolow, Edgar Avalos and Krishna Mohan did not allow for:
+dust splitting, dust sticking to filter, dust moving backwards, trial IDs for running ensembles, momentum conserving collisions, function to determine pore clogging, bimodal distribution of dust size, completed function to add second filter layer
+
+Any functions not indicated as "// Credited by ..." are either new or entirely rewritten functions by Kevin Van Slyke.
+
+%==========================================================
 Input Files...
 
-1) parameters.txt
+1- parameters.txt
 
 xSites ySites (horizontal/width of simulation area in # of lattice sites) (vertical/height of simulation area)
 
@@ -22,25 +28,26 @@ poreSeparation poreWidth poreDepth (for filter layer 1)
 
 pore2Separation pore2Width pore2Depth (for filter layer 2)
 
+%===========================================================
 Output Files...
 
-1) dustCount.txt
+1- dustCount.txt
 
 At every timestep: # Dust moving, stuck, pseudo-stuck (not moving near filter), too large to move, merged, total, handled
 
-2) dustDist.txt
+2- dustDist.txt
 
 Distribution of sizes and widths
 time, avg width of moving ptcls, width std dev of moving ptcls, avg size of moving ptcls, size std dev of moving ptcls, avg size of all ptcls, size std dev of all ptcls
 
-3) dustfile.txt
+3- dustfile.txt
 
 At every timestep: grainID, size, x-position of pixel-0, y-position of pixel-0, curx, cury
 
-4) dustfilePillCount.txt
+4- dustfilePillCount.txt
 
 At each timestep: # of ptcls within pillBox around each pore
 
-5) poresBlocked.txt
+5- poresBlocked.txt
 
 ID of pore blocked, time of blockage

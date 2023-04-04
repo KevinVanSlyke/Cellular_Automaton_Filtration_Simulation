@@ -3,7 +3,7 @@
 //  Dust simulation for Dr. Sen 
 //  Dated July 29 2005
 
-/*	Edited by Kevin VanSlyke
+/*	Rewritten by Kevin VanSlyke
 kgvansly@buffalo.edu
 Dated Jan 2 2016	*/
 
@@ -15,7 +15,7 @@ Dated Jan 2 2016	*/
 #include <stdio.h>  // for using fopen 
 
 //Default constructor
-world::world()
+world::world() //Credited Adam Sokolow
 {
 	myXSites = 500;
 	myYSites = 500;
@@ -39,7 +39,7 @@ world::world()
 }
 
 //Constructor with size and momentum inputs
-world::world(int x, int y, int XMom, int YMom, int negYMom)
+world::world(int x, int y, int XMom, int YMom, int negYMom) //Credited Adam Sokolow, change from velocity to momentum and backwards movement introduced by Kevin Van Slyke
 {
 	myXSites = x;
 	myYSites = y;
@@ -63,7 +63,7 @@ world::world(int x, int y, int XMom, int YMom, int negYMom)
 }
 
 // Copy constructor 
-world::world(const world  & w)
+world::world(const world  & w)  //Credited Adam Sokolow
 {
 	for (int c = 0; c < myXSites; ++c)
 	{
@@ -91,7 +91,7 @@ world::world(const world  & w)
 }
 
 // Destructor, frees memory 
-world ::~world()
+world ::~world()  //Credited Adam Sokolow
 {
 	for (int c = 0; c < myYSites; ++c)
 	{
@@ -104,7 +104,7 @@ world ::~world()
 }
 
 const world  &
-world ::operator = (const world  & rhs)
+world ::operator = (const world  & rhs) //Credited Adam Sokolow
 {
 	if (this != &rhs)                           // don't assign to self! 
 	{
@@ -133,7 +133,7 @@ world ::operator = (const world  & rhs)
 	return *this;
 }
 
-void world::setWorld(int x, int y, int id)
+void world::setWorld(int x, int y, int id) //Credited Adam Sokolow
 {
 	myWorld[y][x] = id;
 }
@@ -169,7 +169,7 @@ int world::getMaxYSize()
 }
 
 //Adds dust grains one at a time until the number of grians specified by a parameter is reached.
-void world::populateWorld(int numDust, int low, int high)
+void world::populateWorld(int numDust, int low, int high) //Credited Adam Sokolow
 {
 	std::cout << "Populating World!" << std::endl;
 	while (myList->getTotal() < numDust)
@@ -181,7 +181,7 @@ void world::populateWorld(int numDust, int low, int high)
 }
 
 //As above, but also adds a single filter
-void world::populateWorld(int numDust, int low, int high, int filterGap, int filterWidth, int filterLength)
+void world::populateWorld(int numDust, int low, int high, int filterGap, int filterWidth, int filterLength) //Credited Adam Sokolow
 {
 	std::cout << "Populating World!" << std::endl;
 
@@ -235,7 +235,7 @@ void world::populateWorld(int numDust, int low, int high, int filterGap, int fil
 
 /*	//Routine to create oscillations in the filter to study dust response
 //TODO: Test and get working for one filter
-void world::shakefilter(int filterGap, int filterWidth, int filterLength, float timeF)
+void world::shakefilter(int filterGap, int filterWidth, int filterLength, float timeF) //Credited 
 {
 	updateWorld();
 	myList->addGrain2(filterGap, filterWidth, filterLength);
@@ -342,7 +342,7 @@ int ** world::getWorldArray()
 	return myWorld;
 }
 
-int world::getCurNumDust()
+int world::getCurNumDust() //Credited Adam Sokolow
 {
 	return myList->getTotal();
 }
